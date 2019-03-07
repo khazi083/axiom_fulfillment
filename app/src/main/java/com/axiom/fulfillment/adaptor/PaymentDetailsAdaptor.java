@@ -30,7 +30,6 @@ public class PaymentDetailsAdaptor extends RecyclerView.Adapter<PaymentDetailsAd
         }
     }
 
-
     public PaymentDetailsAdaptor(Context ctx, List<PaymentDetail> paymentdetailslist) {
         this.paymentdetailslist = paymentdetailslist;
         this.ctx=ctx;

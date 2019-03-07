@@ -19,6 +19,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
     private List<String> expandableListTitle;
     private LinkedHashMap<String, List<String>> expandableListDetail;
 
+
     public CustomExpandableListAdapter(Context context, List<String> expandableListTitle,
                                        LinkedHashMap<String, List<String>> expandableListDetail) {
         this.context = context;
@@ -36,6 +37,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
     public long getChildId(int listPosition, int expandedListPosition) {
         return expandedListPosition;
     }
+
 
     @Override
     public View getChildView(int listPosition, final int expandedListPosition,

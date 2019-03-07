@@ -15,12 +15,24 @@
 
         <ImageView
             android:id="@+id/deliveryicon"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_gravity="center"
             android:layout_centerInParent="true"
             android:layout_alignParentStart="true"
             android:src="@drawable/axiomlogonew3"/>
+
+        <TextView
+            android:id="@+id/seqno"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/deliveryicon"
+            android:textColor="@color/white"
+            android:paddingStart="3dp"
+            android:paddingEnd="3dp"
+            android:background="@drawable/btn_corner"
+            android:visibility="gone"
+            android:textSize="12sp"/>
 
         <LinearLayout
             android:id="@+id/main3"

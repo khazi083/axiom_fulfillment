@@ -19,7 +19,7 @@ import com.axiom.fulfillment.helper.OrderActionListner;
 import com.axiom.fulfillment.helper.UserSharedPreferences;
 import com.axiom.fulfillment.helper.constants;
 import com.axiom.fulfillment.model.DispatchOrderitem;
-import com.axiom.fulfillment.model.DispatchOrders;
+import com.axiom.fulfillment.model.PosXorders;
 import com.axiom.fulfillment.model.UserDetails;
 import com.axiom.fulfillment.model.orderApi;
 
@@ -30,14 +30,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class DispatchOrderList extends BaseActivity implements OrderActionListner {
+public class PosxOrderList extends BaseActivity implements OrderActionListner {
 
     RecyclerView recyclerView;
     private DispatchOrderAdaptor mAdapter;
     private List<DispatchOrderitem> orderList = new ArrayList<>();
     private List<DispatchOrderitem> searchorderList = new ArrayList<>();
     UserSharedPreferences upref;
-    String key = "";
+    String key = constants.POSX;
     EditText searchtext;
     TextView count;
 
@@ -45,38 +45,17 @@ public class DispatchOrderList extends BaseActivity implements OrderActionListne
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_orderlist);
-        if (getIntent().hasExtra(constants.order_type))
-            key = getIntent().getStringExtra(constants.order_type);
-
         recyclerView = findViewById(R.id.recycler_view);
         upref = new UserSharedPreferences(this);
         searchtext = findViewById(R.id.search_order);
         count=findViewById(R.id.count);
+
         getToken(this);
-        if (key != null && !key.isEmpty())
-            getorderdata();
+        getorderdata();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-
-        if (key.equalsIgnoreCase(constants.order_rtd))
-            getSupportActionBar().setTitle(getString(R.string.dispatch_screen));
-        else if (key.equalsIgnoreCase(constants.AWBCREATED))
-            getSupportActionBar().setTitle(getString(R.string.AWB_screen));
-        else if (key.equalsIgnoreCase(constants.SHIPPED))
-            getSupportActionBar().setTitle(getString(R.string.Shipped_screen));
-        else if (key.equalsIgnoreCase(constants.CANCELLED))
-            getSupportActionBar().setTitle(getString(R.string.Cancelled_screen));
-        else if (key.equalsIgnoreCase(constants.COMPLETE))
-            getSupportActionBar().setTitle(getString(R.string.Delivered_screen));
-        else if (key.equalsIgnoreCase(constants.PREORDER))
-            getSupportActionBar().setTitle(getString(R.string.PreOrder_screen));
-        else if (key.equalsIgnoreCase(constants.INPROGRESS))
-            getSupportActionBar().setTitle(getString(R.string.InProcess_screen));
-        else if (key.equalsIgnoreCase(constants.PENDINGRMO))
-            getSupportActionBar().setTitle(getString(R.string.Pending_Screen));
-        else if (key.equalsIgnoreCase(constants.PENDINGRECIEVING))
-            getSupportActionBar().setTitle(getString(R.string.PendingReceving_Screen));
+        getSupportActionBar().setTitle(getString(R.string.Posx_Screen));
 
         searchtext.addTextChangedListener(new TextWatcher() {
             @Override
@@ -93,12 +72,12 @@ public class DispatchOrderList extends BaseActivity implements OrderActionListne
             public void afterTextChanged(Editable s) {
 
                 if (s.length() == 0) {
-                    mAdapter = new DispatchOrderAdaptor(DispatchOrderList.this, orderList, DispatchOrderList.this);
+                    mAdapter = new DispatchOrderAdaptor(PosxOrderList.this, orderList, PosxOrderList.this);
                     recyclerView.setAdapter(mAdapter);
                     mAdapter.notifyDataSetChanged();
                 } else if (s.length() > 0) {
                     performFiltering(searchtext.getText().toString());
-                    mAdapter = new DispatchOrderAdaptor(DispatchOrderList.this, searchorderList, DispatchOrderList.this);
+                    mAdapter = new DispatchOrderAdaptor(PosxOrderList.this, searchorderList, PosxOrderList.this);
                     recyclerView.setAdapter(mAdapter);
                     mAdapter.notifyDataSetChanged();
                 }
@@ -138,27 +117,24 @@ public class DispatchOrderList extends BaseActivity implements OrderActionListne
 
         APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
         orderApi ord = new orderApi();
-        ord.setstaus(key);
         ord.setOadbEmployeeId(upref.getKeyEmpCode());
         ord.setUserDetails(new UserDetails(upref.getUserId(), upref.getFirstName()));
-
         startLoader(getString(R.string.loading), this);
-        ord.setOgmlGeneralRemarks(key);
-        Call<DispatchOrders> stringCall = apiService.dispatchorderdetails(ord);
+        Call<PosXorders> stringCall = apiService.getPosxorders(ord);
 
-        stringCall.enqueue(new Callback<DispatchOrders>() {
+        stringCall.enqueue(new Callback<PosXorders>() {
             @Override
-            public void onResponse(Call<DispatchOrders> call, Response<DispatchOrders> response) {
+            public void onResponse(Call<PosXorders> call, Response<PosXorders> response) {
                 stopLoader();
                 if (response.isSuccessful() && response.body() != null) {
                     orderList = response.body().getOrderData();
                     if (orderList.size() == 0) {
-                        ShowToast(getString(R.string.noorders), DispatchOrderList.this);
+                        ShowToast(getString(R.string.noorders), PosxOrderList.this);
                         finish();
                         return;
                     }
                     count.setText("Total Count : "+ orderList.size());
-                    mAdapter = new DispatchOrderAdaptor(DispatchOrderList.this, orderList, DispatchOrderList.this);
+                    mAdapter = new DispatchOrderAdaptor(PosxOrderList.this, orderList, PosxOrderList.this);
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
                     recyclerView.setLayoutManager(mLayoutManager);
                     recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -167,7 +143,7 @@ public class DispatchOrderList extends BaseActivity implements OrderActionListne
             }
 
             @Override
-            public void onFailure(Call<DispatchOrders> call, Throwable t) {
+            public void onFailure(Call<PosXorders> call, Throwable t) {
                 stopLoader();
             }
         });
@@ -177,27 +153,35 @@ public class DispatchOrderList extends BaseActivity implements OrderActionListne
     @Override
     public void ondeliver(int position) {
         if (searchtext.getText().length() == 0) {
-            Intent intent = new Intent(DispatchOrderList.this, OrderDetailActivity.class);
+            Intent intent = new Intent(PosxOrderList.this, OrderDetailActivity.class);
             intent.putExtra(constants.OABOID, "");
             intent.putExtra(constants.OADBID, "");
             intent.putExtra(constants.ObohSeq, orderList.get(position).getObohSeq());
             intent.putExtra(constants.ORDERNO, orderList.get(position).getObohOrderNo());
             intent.putExtra(constants.CHANNELCODE, orderList.get(position).getAclmChannelCode());
             intent.putExtra(constants.SOURCE, orderList.get(position).getObohOrderSource());
+            intent.putExtra(constants.POSSTOCKLOC, orderList.get(position).getStockLocationCode());
+            intent.putExtra(constants.POSORDERSTATUS, orderList.get(position).getObohOrderStatus());
+            intent.putExtra(constants.POSPURCHASENO, orderList.get(position).getObohPartnerOrderNo());
             intent.putExtra(constants.PICKLOCATION,  orderList.get(position).getOrdPickOrderLocation());
+
             intent.putExtra(constants.User_name, upref.getFirstName());
             intent.putExtra(constants.userid, upref.getUserId());
             intent.putExtra(constants.usercode, upref.getKeyUserCode());
             intent.putExtra(constants.order_type, key);
             startActivity(intent);
         } else {
-            Intent intent = new Intent(DispatchOrderList.this, OrderDetailActivity.class);
+            Intent intent = new Intent(PosxOrderList.this, OrderDetailActivity.class);
             intent.putExtra(constants.OABOID, "");
             intent.putExtra(constants.OADBID, "");
             intent.putExtra(constants.ObohSeq, searchorderList.get(position).getObohSeq());
             intent.putExtra(constants.ORDERNO, searchorderList.get(position).getObohOrderNo());
-            intent.putExtra(constants.CHANNELCODE, searchorderList.get(position).getAclmChannelCode());
+            intent.putExtra(constants.CHANNELCODE, searchorderList.get(position).getStockChannelCode());
             intent.putExtra(constants.SOURCE, searchorderList.get(position).getObohOrderSource());
+
+            intent.putExtra(constants.POSSTOCKLOC, searchorderList.get(position).getStockLocationCode());
+            intent.putExtra(constants.POSORDERSTATUS, searchorderList.get(position).getObohOrderStatus());
+            intent.putExtra(constants.POSPURCHASENO, searchorderList.get(position).getObohPartnerOrderNo());
             intent.putExtra(constants.PICKLOCATION,  searchorderList.get(position).getOrdPickOrderLocation());
             intent.putExtra(constants.User_name, upref.getFirstName());
             intent.putExtra(constants.userid, upref.getUserId());

@@ -4,6 +4,7 @@ import com.axiom.fulfillment.model.BikerList;
 import com.axiom.fulfillment.model.ButtonStatus;
 import com.axiom.fulfillment.model.ButtonStatusResult;
 import com.axiom.fulfillment.model.CancelOrder;
+import com.axiom.fulfillment.model.CancelPosxOrder;
 import com.axiom.fulfillment.model.CommonApiResponse;
 import com.axiom.fulfillment.model.CourierList;
 import com.axiom.fulfillment.model.CourierListInput;
@@ -13,10 +14,14 @@ import com.axiom.fulfillment.model.DeliveryRequest;
 import com.axiom.fulfillment.model.DispatchOrders;
 import com.axiom.fulfillment.model.ErpPriceCheck;
 import com.axiom.fulfillment.model.ErpStockInput;
+import com.axiom.fulfillment.model.Invoice;
+import com.axiom.fulfillment.model.InvoiceInput;
 import com.axiom.fulfillment.model.Locationlist;
 import com.axiom.fulfillment.model.OrderDetailsInput;
 import com.axiom.fulfillment.model.Order_details;
-import com.axiom.fulfillment.model.Organization;
+import com.axiom.fulfillment.model.PosXorders;
+import com.axiom.fulfillment.model.ShipmentReport;
+import com.axiom.fulfillment.model.ShipmentReportinput;
 import com.axiom.fulfillment.model.StockList;
 import com.axiom.fulfillment.model.StockPriceList;
 import com.axiom.fulfillment.model.UserDetails;
@@ -34,7 +39,7 @@ import com.axiom.fulfillment.model.orderApi;
 import com.axiom.fulfillment.model.organizationList;
 import com.axiom.fulfillment.model.tokenresponse;
 import com.axiom.fulfillment.model.userrolesList;
-import com.axiom.fulfillment.view.Erp_Stock;
+
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -113,4 +118,17 @@ public interface APIInterface {
 
     @POST("api/Pricing/GetRpmPrices")
     Call<StockPriceList> getStockPrice(@Body ErpPriceCheck input);
+
+
+    @POST("api/logistics/GetShipmentReport")
+    Call<ShipmentReport> getshipmentreport(@Body ShipmentReportinput input);
+
+    @POST("Invoice")
+    Call<Invoice> getInvoice(@Body InvoiceInput input);
+
+    @POST("api/active/Orders")
+    Call<PosXorders> getPosxorders(@Body orderApi orderApi);
+
+    @POST("api/active/order/cancel")
+    Call<CommonApiResponse> cancelPosxOrder(@Body CancelPosxOrder userdata);
 }

@@ -20,7 +20,6 @@ public class UserSharedPreferences {
     private static final String KEY_TOKEN_TIME = "tokentime";
     private static final String KEY_EMP_CODE = "hrempcode";
     private static final String KEY_USER_ROLE = "userrole";
-    // Constructor
 
     public String getKeyUserRole() {
         return pref.getString(KEY_USER_ROLE, "");

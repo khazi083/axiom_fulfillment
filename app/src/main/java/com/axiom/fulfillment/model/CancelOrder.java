@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class CancelOrder {
 
+
     @SerializedName("ObohOrderNo")
     @Expose
     private String ObohOrderNo;

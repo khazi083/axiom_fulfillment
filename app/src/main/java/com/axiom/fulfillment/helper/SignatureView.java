@@ -12,7 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 
-public class SignatureView extends View {
+public class   SignatureView extends View {
 
     // set the stroke width
     private static final float STROKE_WIDTH = 5f;

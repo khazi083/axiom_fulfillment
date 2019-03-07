@@ -1,7 +1,5 @@
 package com.axiom.fulfillment.adaptor;
 
-
-
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -51,7 +49,6 @@ public class OrderItemAdaptor extends RecyclerView.Adapter<OrderItemAdaptor.MyVi
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.orderlist_item, parent, false);
-
         return new MyViewHolder(itemView);
     }
 
@@ -69,8 +66,6 @@ public class OrderItemAdaptor extends RecyclerView.Adapter<OrderItemAdaptor.MyVi
             holder.deliveryicon.setImageResource(R.drawable.huaweiksa);
         else if(or.getObohOrderSource().contains("NOON"))
             holder.deliveryicon.setImageResource(R.drawable.noon);
-        else if(or.getObohOrderSource().contains("NOON"))
-            holder.deliveryicon.setImageResource(R.drawable.noon);
         else if(or.getObohOrderSource().contains("SWITCh"))
             holder.deliveryicon.setImageResource(R.drawable.aeswitch1);
         else if(or.getObohOrderSource().contains("HONOR"))
@@ -81,6 +76,8 @@ public class OrderItemAdaptor extends RecyclerView.Adapter<OrderItemAdaptor.MyVi
             holder.deliveryicon.setImageResource(R.drawable.htcuae);
         else if(or.getObohOrderSource().contains("WADI"))
             holder.deliveryicon.setImageResource(R.drawable.wadiksa);
+        else if(or.getObohOrderSource().contains("SAMSUNG"))
+            holder.deliveryicon.setImageResource(R.drawable.samsung);
         holder.mainlayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

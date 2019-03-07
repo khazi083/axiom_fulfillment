@@ -348,7 +348,7 @@ public class Erp_Stock extends BaseActivity  {
                     orgname.add("select organization");
                     for (int i = 0; i < organization.size(); i++)
                         orgname.add(organization.get(i).getAomsOrganizationName());
-                   orgAdapter = new ArrayAdapter<String>(Erp_Stock.this, android.R.layout.simple_spinner_item, orgname);
+                    orgAdapter = new ArrayAdapter<String>(Erp_Stock.this, android.R.layout.simple_spinner_item, orgname);
                     orgAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     org_list.setAdapter(orgAdapter);
                 } else {

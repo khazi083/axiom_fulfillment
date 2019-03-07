@@ -1,7 +1,15 @@
 package com.axiom.fulfillment.view;
+import android.Manifest;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.axiom.fulfillment.R;
@@ -18,23 +26,36 @@ import com.axiom.fulfillment.model.BikerRequest;
 import com.axiom.fulfillment.model.ButtonStatus;
 import com.axiom.fulfillment.model.ButtonStatusResult;
 import com.axiom.fulfillment.model.CancelOrder;
+import com.axiom.fulfillment.model.CancelPosxOrder;
 import com.axiom.fulfillment.model.Courier;
 import com.axiom.fulfillment.model.CourierList;
 import com.axiom.fulfillment.model.CourierListInput;
 import com.axiom.fulfillment.model.CourierOrder;
 import com.axiom.fulfillment.model.CourierdispatchResponse;
 import com.axiom.fulfillment.model.DeliveryRequest;
+import com.axiom.fulfillment.model.Invoice;
+import com.axiom.fulfillment.model.InvoiceInput;
 import com.axiom.fulfillment.model.OrderDetail;
 import com.axiom.fulfillment.model.OrderDetailsInput;
 
 import com.axiom.fulfillment.model.Order_details;
+import com.axiom.fulfillment.model.ShipmentReport;
+import com.axiom.fulfillment.model.ShipmentReportinput;
 import com.axiom.fulfillment.model.SystemCourier;
 import com.axiom.fulfillment.model.UserDetails;
 import com.axiom.fulfillment.model.CommonApiResponse;
 import com.axiom.fulfillment.model.bikerdispatch;
 import com.axiom.fulfillment.model.createcourierorder;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 
 
+import android.os.Environment;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -46,12 +67,15 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,33 +88,40 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class OrderDetailActivity extends BaseActivity {
+
+public class OrderDetailActivity extends BaseActivity implements  GoogleApiClient.ConnectionCallbacks {
 
     private Order_details details;
-    String order_status, ChannelCode, source;
+    String order_status, ChannelCode, source,POSSTOCKLOC,POSORDERSTATUS,POSPURCHASENO, PickLocation;
+    String DeliverGps,PickGps;
     int userid, OABOID, OADBID;
     String orderno, user_name, user_code, order_seqno;
     UserSharedPreferences upref;
-    EditText ordernotxt, orderdate, sorce, purchaseno, remarks, amount, totamount, comments;
-    EditText cust_name, cust_mob, shipping_address;
+    TextView ordernotxt, orderdate, sorce, purchaseno, remarks, amount, totamount, comments,cust_name, cust_mob;
+    TextView  shipping_address;
+    TextView picklocation;
     RecyclerView orderitems, paymentdetails;
     OrderDetailsAdaptor orderDetailsAdaptor;
     PaymentDetailsAdaptor paymentDetailsAdaptor;
     RelativeLayout main;
-    Button deliver, pick, cancel, assign_biker;
-    Button assign_courier, reshedule, invoice,order_cancel,invoice_awb;
+    Button deliver, pick, cancel, assign_biker,shipmentbill,maps;
+    Button assign_courier, reshedule, invoice,order_cancel;
     int req_code = 201;
     private List<Biker> bikers;
     private List<SystemCourier> systemCouriers;
     private ArrayList<String> bikernames;
     private ArrayList<String> couriernames;
     private ButtonStatusResult btnresult;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLastLocation;
+    private LocationRequest locationRequest;
+    private LinearLayout layout_comments, layout_remarks,layout_pickloc;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.frag_orderdetails);
+        setContentView(R.layout.order_details);
         main = findViewById(R.id.main);
         main.setVisibility(View.INVISIBLE);
         ordernotxt = findViewById(R.id.morderno);
@@ -100,11 +131,11 @@ public class OrderDetailActivity extends BaseActivity {
         purchaseno = findViewById(R.id.purchaseno);
         remarks = findViewById(R.id.mremarks);
         amount = findViewById(R.id.mamount);
-
+        picklocation=findViewById(R.id.picklocation);
         totamount = findViewById(R.id.mamounttotal);
         comments = findViewById(R.id.mcomments);
         cust_name = findViewById(R.id.mname);
-
+        maps=findViewById(R.id.maps);
         cust_mob = findViewById(R.id.mmobile);
         shipping_address = findViewById(R.id.mshipadress);
         orderitems = findViewById(R.id.order_itemList);
@@ -117,8 +148,18 @@ public class OrderDetailActivity extends BaseActivity {
         reshedule = findViewById(R.id.reshedule);
         invoice = findViewById(R.id.invoice);
         order_cancel=findViewById(R.id.order_cancel);
+        layout_comments=findViewById(R.id.layout_comments);
+        layout_remarks=findViewById(R.id.layout_remarks);
+        layout_pickloc=findViewById(R.id.layout_pickloc);
         couriernames = new ArrayList<>();
         bikernames = new ArrayList<>();
+        shipmentbill=findViewById(R.id.shipmentbill);
+        shipmentbill.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getShipmentReport();
+            }
+        });
 
         deliver.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -161,11 +202,7 @@ public class OrderDetailActivity extends BaseActivity {
         invoice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String encryptorder = encrypt("7061737323313233",  details.getOrderDetail().get(0).getOrderSequence().toString());
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://fulfilment.axiomtelecom.com/Reports/Receipt/MPerformaInvoice.aspx?OrderNo=" + encryptorder));
-                //        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://fulfilment.axiomtelecom.com/Reports/Receipt/PerfomaInvoices.aspx?hs=VweuOGU8tidM6ei1sy2T3Q=="));
-
-                startActivity(browserIntent);
+                getInvoice();
             }
         });
         order_cancel.setOnClickListener(new View.OnClickListener() {
@@ -175,6 +212,16 @@ public class OrderDetailActivity extends BaseActivity {
             }
         });
 
+        maps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(DeliverGps!=null &&!DeliverGps.isEmpty() && PickGps!=null && !PickGps.isEmpty() && !DeliverGps.equalsIgnoreCase("No GPS Coordinates") &&!PickGps.equalsIgnoreCase("No GPS Coordinates"))
+                    showmaps();
+                else
+                    ShowToast("Delivery Location not available.", OrderDetailActivity.this);
+
+            }
+        });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setTitle(getString(R.string.Order_Details));
@@ -191,11 +238,190 @@ public class OrderDetailActivity extends BaseActivity {
         order_seqno = getIntent().getStringExtra(constants.ObohSeq);
         ChannelCode = getIntent().getStringExtra(constants.CHANNELCODE);
         source = getIntent().getStringExtra(constants.SOURCE);
-        if (!order_status.equalsIgnoreCase(constants.ORDER_CREATED)&& !order_status.equalsIgnoreCase(constants.ORDER_PICKED)&&
+        PickLocation=getIntent().getStringExtra(constants.PICKLOCATION);
+
+        if(PickLocation!=null && !PickLocation.isEmpty() && order_status.equalsIgnoreCase(constants.ORDER_CREATED) )
+        {
+            layout_pickloc.setVisibility(View.VISIBLE);
+            picklocation.setText(  PickLocation );
+        }
+
+        POSSTOCKLOC = getIntent().getStringExtra(constants.POSSTOCKLOC);
+        POSORDERSTATUS = getIntent().getStringExtra(constants.POSORDERSTATUS);
+        POSPURCHASENO = getIntent().getStringExtra(constants.POSPURCHASENO);
+        DeliverGps=getIntent().getStringExtra(constants.DELIVERGPS);
+        PickGps=getIntent().getStringExtra(constants.PICKGPS);
+
+        if( order_status.equalsIgnoreCase(constants.ORDER_DELIVERED)){
+            maps.setVisibility(View.VISIBLE);
+        }
+        if (!order_status.equalsIgnoreCase(constants.ORDER_CREATED)&& !order_status.equalsIgnoreCase(constants.ORDER_PICKED)&& !order_status.equalsIgnoreCase(constants.POSX)&&
                 !order_status.equalsIgnoreCase(constants.ORDER_DELIVERED)&& !order_status.equalsIgnoreCase(constants.ORDER_CANCELLED))
             getButtonStatus();
         getorderdata();
+        statusCheck();
+        buildGoogleApiClient();
+        createLocationRequest();
 
+    }
+
+    private void showmaps() {
+        if(PickGps.equalsIgnoreCase(DeliverGps))
+            PickGps="25.1208242,55.3782563"; // axiom location
+        Uri gmmIntentUri = Uri.parse("https://www.google.com/maps/dir/?api=1&origin="+PickGps+"&destination="+DeliverGps);
+        Intent intent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        intent.setPackage("com.google.android.apps.maps");
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException ex) {
+            try {
+                Intent unrestrictedIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                startActivity(unrestrictedIntent);
+            } catch (ActivityNotFoundException innerEx) {
+                Toast.makeText(this, "Please install maps application", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+//            mylocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                callPermission();
+                return;
+            }
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient);
+
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    /* Second part*/
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.connect();
+        }
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    private void callPermission() {
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+            //If the user has denied the permission previously your code will come to this block
+            //Here you can explain why you need this permission
+            //Explain here why you need this permission
+        }
+
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            //If the user has denied the permission previously your code will come to this block
+            //Here you can explain why you need this permission
+            //Explain here why you need this permission
+        }
+
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            //If the user has denied the permission previously your code will come to this block
+            //Here you can explain why you need this permission
+            //Explain here why you need this permission
+        }
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            //If the user has denied the permission previously your code will come to this block
+            //Here you can explain why you need this permission
+            //Explain here why you need this permission
+        }
+
+        //And finally ask for the permission
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_COARSE_LOCATION}, 3);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        if (requestCode == 3) {
+            for (int i = 0; i < grantResults.length; i++) {
+                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+
+                   /* PackageManager packageManager = getApplicationContext().getPackageManager();
+                    if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA))
+                    {*/
+                    if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                        callPermission();
+                    }
+                    if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        callPermission();
+                    }
+
+                    if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        callPermission();
+                    }
+
+                    if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        callPermission();
+                    }
+                    // }
+
+                    //Displaying a toast
+                    //
+                }  //Displaying another toast if permission is not granted //Toast.makeText(this, "Oops you just denied the permission", Toast.LENGTH_LONG).show();
+                /*else {
+                  //  Toast.makeText(this, "Permission granted now you can read the storage", Toast.LENGTH_LONG).show();
+                }*/
+            }
+
+        }
+    }
+
+    public void statusCheck() {
+        final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            buildAlertMessageNoGps();
+
+        }
+    }
+
+
+    private void buildAlertMessageNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
+                .setCancelable(true)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private void createLocationRequest() {
+        int LOCATION_DISTANCE = 10;
+        int LOCATION_UPDATE_INTERVAL = 8000;
+        locationRequest = new LocationRequest();
+        locationRequest.setInterval(LOCATION_UPDATE_INTERVAL); //in milliseconds
+        locationRequest.setFastestInterval(5000); //in milliseconds
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locationRequest.setSmallestDisplacement(LOCATION_DISTANCE);
     }
 
     private void getButtonStatus() {
@@ -213,7 +439,7 @@ public class OrderDetailActivity extends BaseActivity {
                 if (response.body()!=null && response.body().getStatus().getOutResult()) {
                     btnresult = response.body();
                     showbtn();
-                } else {
+                } else if(response.body()!=null&& response.body().getStatus()!=null) {
                     ShowToast("Error :" + response.body().getStatus().getOutMessage(), OrderDetailActivity.this);
                 }
             }
@@ -227,9 +453,10 @@ public class OrderDetailActivity extends BaseActivity {
     }
 
     private void showbtn() {
-
         invoice.setVisibility(View.GONE);
         order_cancel.setVisibility(View.GONE);
+        shipmentbill.setVisibility(View.GONE);
+        assign_biker.setVisibility(View.GONE);
 
         if (btnresult.getCanCancel()){
             order_cancel.setVisibility(View.VISIBLE);
@@ -237,7 +464,13 @@ public class OrderDetailActivity extends BaseActivity {
         if(btnresult.getShowInvoice()){
             invoice.setVisibility(View.VISIBLE);
         }
-    //    main.setVisibility(View.VISIBLE);
+        if(btnresult.getShowAirwayBill()){
+            shipmentbill.setVisibility(View.VISIBLE);
+        }
+        if(btnresult.getShowAxiomBikerDelivery()){
+            assign_biker.setVisibility(View.VISIBLE);
+        }
+     main.setVisibility(View.VISIBLE);
     }
 
 
@@ -482,7 +715,10 @@ public class OrderDetailActivity extends BaseActivity {
                 if (msgtxt.equalsIgnoreCase("pick")) {
                     onpick();
                 } else if (msgtxt.equalsIgnoreCase("cancel")) {
-                    oncancel();
+                    if  (order_status.equalsIgnoreCase(constants.POSX))
+                        cancel_posxorder();
+                    else
+                        oncancel();
                 } else if (msgtxt.equalsIgnoreCase("reshedule")) {
                     onreshedule();
                 }else if (msgtxt.equalsIgnoreCase("cancel order")) {
@@ -500,6 +736,42 @@ public class OrderDetailActivity extends BaseActivity {
         });
         dialogView.show();
 
+    }
+
+    private void cancel_posxorder() {
+        APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
+        CancelPosxOrder co= new CancelPosxOrder();
+        co.setUserDetails(new UserDetails(upref.getUserId(), upref.getFirstName()));
+        co.setAxiomOrderNo(orderno);
+        if(order_seqno!=null && !order_seqno.isEmpty())
+            co.setOrderSequence(Double.valueOf(order_seqno));
+        co.setCancelReason("order cancelled from mobile");
+        co.setStockChannel(ChannelCode);
+        co.setOrderSource(source);
+        co.setEPurchaseNo(Double.valueOf(POSPURCHASENO));
+        co.setStockLocation(Double.valueOf(POSSTOCKLOC));
+        co.setOrderStatus(POSORDERSTATUS);
+        Call<CommonApiResponse> stringCall = apiService.cancelPosxOrder(co);
+        startLoader(getString(R.string.loading), this);
+        stringCall.enqueue(new Callback<CommonApiResponse>() {
+            @Override
+            public void onResponse(Call<CommonApiResponse> call, Response<CommonApiResponse> response) {
+                stopLoader();
+                if (response.body().getStatus().getOutResult()) {
+                    ShowToast("Order Cancelled.", OrderDetailActivity.this);
+                    finish();
+                } else {
+                    ShowToast("Error :" + response.body().getStatus().getOutMessage(), OrderDetailActivity.this);
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<CommonApiResponse> call, Throwable t) {
+                stopLoader();
+                ShowToast(getString(R.string.api_fail), OrderDetailActivity.this);
+            }
+        });
     }
 
     private void cancel_order() {
@@ -556,11 +828,12 @@ public class OrderDetailActivity extends BaseActivity {
         stringCall.enqueue(new Callback<Order_details>() {
             @Override
             public void onResponse(Call<Order_details> call, Response<Order_details> response) {
-                stopLoader();
+
                 if (response.body()!=null && response.body().getStatus().getOutResult()) {
                     details = response.body();
                     initview();
                 } else {
+                    stopLoader();
                     ShowToast("Error :" + response.body().getStatus().getOutMessage(), OrderDetailActivity.this);
                 }
 
@@ -578,13 +851,20 @@ public class OrderDetailActivity extends BaseActivity {
     private void initview() {
         OrderDetail mOrderDetails = details.getOrderDetail().get(0);
         ordernotxt.setText(mOrderDetails.getOrderNumber());
-        orderdate.setText(mOrderDetails.getOrderDate());
+        orderdate.setText(mOrderDetails.getOrderDate().replace("T"," "));
         sorce.setText(mOrderDetails.getOrderSource());
         purchaseno.setText(mOrderDetails.getObohPartnerOrderNo());
-        remarks.setText(mOrderDetails.getRemarks());
+        if(mOrderDetails.getRemarks()!=null && !mOrderDetails.getRemarks().isEmpty()) {
+            remarks.setText(mOrderDetails.getRemarks());
+            layout_remarks.setVisibility(View.VISIBLE);
+        }
+        if(mOrderDetails.getComments()!=null && !mOrderDetails.getComments().isEmpty()) {
+            comments.setText(mOrderDetails.getComments());
+            layout_comments.setVisibility(View.VISIBLE);
+        }
         amount.setText(String.valueOf(mOrderDetails.getOrderAmount()) + " " + mOrderDetails.getCurrencyCode());
         totamount.setText(String.valueOf(mOrderDetails.getTotalAmount()) + " " + mOrderDetails.getCurrencyCode());
-        comments.setText(mOrderDetails.getComments());
+
         cust_name.setText(mOrderDetails.getCustomerFullName());
         cust_mob.setText(mOrderDetails.getCustomerMobile());
         shipping_address.setText(mOrderDetails.getShippingAddress1() + " " + mOrderDetails.getShippingRegion()
@@ -626,7 +906,20 @@ public class OrderDetailActivity extends BaseActivity {
             assign_biker.setVisibility(View.VISIBLE);
             assign_courier.setVisibility(View.VISIBLE);
             reshedule.setVisibility(View.GONE);
-        }  else {
+        } else if  (order_status.equalsIgnoreCase(constants.POSX)) {
+            pick.setVisibility(View.GONE);
+            deliver.setVisibility(View.GONE);
+            cancel.setVisibility(View.GONE);
+            order_cancel.setVisibility(View.VISIBLE);
+            assign_biker.setVisibility(View.GONE);
+            assign_courier.setVisibility(View.GONE);
+            reshedule.setVisibility(View.GONE);
+            invoice.setVisibility(View.GONE);
+
+
+        }
+
+        else {
             pick.setVisibility(View.GONE);
             deliver.setVisibility(View.GONE);
             cancel.setVisibility(View.GONE);
@@ -636,7 +929,11 @@ public class OrderDetailActivity extends BaseActivity {
             invoice.setVisibility(View.GONE);
             reshedule.setVisibility(View.GONE);
         }
-        main.setVisibility(View.VISIBLE);
+        if (order_status.equalsIgnoreCase(constants.ORDER_CREATED)|| order_status.equalsIgnoreCase(constants.ORDER_PICKED)||order_status.equalsIgnoreCase(constants.POSX)||
+                order_status.equalsIgnoreCase(constants.ORDER_DELIVERED)|| order_status.equalsIgnoreCase(constants.ORDER_CANCELLED)) {
+            main.setVisibility(View.VISIBLE);
+            stopLoader();
+        }
 
     }
 
@@ -669,6 +966,9 @@ public class OrderDetailActivity extends BaseActivity {
         req.setAction("CANCEL");
         bike.setOaboId(String.valueOf(OABOID));
         bike.setOadbId(String.valueOf(OADBID));
+        if (mLastLocation != null) {
+            bike.setOaboUserGps(mLastLocation.getLatitude() + "," + mLastLocation.getLongitude());
+        }
         bike.setOaboStatus(constants.ORDER_CANCELLED);
         bike.setOaboComments("ORDER CANCELLED.");
         bike.setUserDetails(new UserDetails(upref.getUserId(), upref.getFirstName()));
@@ -684,6 +984,9 @@ public class OrderDetailActivity extends BaseActivity {
         bike.setOaboId(String.valueOf(OABOID));
         bike.setOadbId(String.valueOf(OADBID));
         bike.setOaboStatus(constants.ORDER_PICKED);
+        if (mLastLocation != null) {
+            bike.setOaboUserGps(mLastLocation.getLatitude() + "," + mLastLocation.getLongitude());
+        }
         bike.setOaboComments("ORDER PICKED.");
         bike.setOaboSignFileType("");
         bike.setOaboSignFileName("");
@@ -733,6 +1036,95 @@ public class OrderDetailActivity extends BaseActivity {
             }
         } catch (Exception ex) {
 
+        }
+    }
+
+    private void getShipmentReport() {
+        APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
+        ShipmentReportinput input= new ShipmentReportinput();
+        input.setAxiomOrderNo(orderno);
+        input.setUser(new UserDetails(upref.getUserId(), upref.getFirstName(), upref.getKeyUserCode(), upref.getKeyEmpCode()));
+        Call<ShipmentReport> stringCall = apiService.getshipmentreport(input);
+        stringCall.enqueue(new Callback<ShipmentReport>() {
+            @Override
+            public void onResponse(Call<ShipmentReport> call, Response<ShipmentReport> response) {
+                stopLoader();
+                if (response.body().getStatus().getOutResult()) {
+                    if(response.body().getReport().size()>0){
+                        convertbase64topdf(response.body().getReport().get(0).getObosdData());
+                    }
+                } else {
+                    ShowToast("Error :" + response.body().getStatus().getOutMessage(), OrderDetailActivity.this);
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<ShipmentReport> call, Throwable t) {
+                stopLoader();
+                ShowToast(getString(R.string.api_fail), OrderDetailActivity.this);
+            }
+        });
+
+    }
+
+    private void getInvoice() {
+        APIInterface apiService = new APIClient(this).getClientforinvoice().create(APIInterface.class);
+        InvoiceInput input= new InvoiceInput();
+        input.setOrderNo(order_seqno);
+        startLoader(getString(R.string.loading), this);
+//        input.setUser(new UserDetails(upref.getUserId(), upref.getFirstName(), upref.getKeyUserCode(), upref.getKeyEmpCode()));
+        Call<Invoice> stringCall = apiService.getInvoice(input);
+        stringCall.enqueue(new Callback<Invoice>() {
+            @Override
+            public void onResponse(Call<Invoice> call, Response<Invoice> response) {
+                stopLoader();
+                if (response.body().getStatus().getOutResult()) {
+                    if(response.body().getInvoice().length()>0){
+                        convertbase64topdf(response.body().getInvoice());
+                    }
+                } else {
+                    ShowToast("Error :" + response.body().getStatus().getOutMessage(), OrderDetailActivity.this);
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<Invoice> call, Throwable t) {
+                stopLoader();
+                ShowToast(getString(R.string.api_fail), OrderDetailActivity.this);
+            }
+        });
+
+    }
+
+    void convertbase64topdf(String data){
+        final File dwldsPath = new File(Environment.getExternalStorageDirectory()+"/Axiom_bikers/" + "bill" + ".pdf");
+        byte[] pdfAsBytes = Base64.decode(data,0);
+        try {
+            FileOutputStream os = new FileOutputStream(dwldsPath, false);
+            os.write(pdfAsBytes);
+            os.flush();
+            os.close();
+            openreport();
+        }
+        catch (Exception e){
+
+        }
+    }
+
+
+    void openreport() {
+        File file = new File(Environment.getExternalStorageDirectory()+"/Axiom_bikers/" + "bill" + ".pdf");
+        Intent target = new Intent(Intent.ACTION_VIEW);
+        target.setDataAndType(Uri.fromFile(file), "application/pdf");
+        target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+        Intent intent = Intent.createChooser(target, "Open File");
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            // Instruct the user to install a PDF reader here, or something
         }
     }
 }

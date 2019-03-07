@@ -8,9 +8,6 @@ public class DispatchOrderitem {
     @SerializedName("ObohSeq")
     @Expose
     private String ObohSeq;
-//    @SerializedName("RtchTransCtrlId")
-//    @Expose
-//    private Integer rtchTransCtrlId;
     @SerializedName("AclmChannelCode")
     @Expose
     private String AclmChannelCode;
@@ -33,6 +30,10 @@ public class DispatchOrderitem {
     @Expose
     private Double obohOrderAmountTax;
 
+    @SerializedName("ObohOrderTotAmount")
+    @Expose
+    private Double ObohOrderTotAmount;
+
     @SerializedName("ObohCurrency")
     @Expose
     private String ObohCurrency;
@@ -40,6 +41,63 @@ public class DispatchOrderitem {
     @SerializedName("ObohPartnerOrderNo")
     @Expose
     private String ObohPartnerOrderNo;
+
+
+    @SerializedName("StockLocationCode")
+    @Expose
+    private String StockLocationCode;
+
+    @SerializedName("StockChannelCode")
+    @Expose
+    private String StockChannelCode;
+    @SerializedName("ObohOrderStatus")
+    @Expose
+    private String ObohOrderStatus;
+
+
+    @SerializedName("OrdPickOrderLocation")
+    @Expose
+    private String OrdPickOrderLocation;
+
+    public String getOrdPickOrderLocation() {
+        return OrdPickOrderLocation;
+    }
+
+    public void setOrdPickOrderLocation(String ordPickOrderLocation) {
+        OrdPickOrderLocation = ordPickOrderLocation;
+    }
+
+    public String getStockLocationCode() {
+        return StockLocationCode;
+    }
+
+    public void setStockLocationCode(String stockLocationCode) {
+        StockLocationCode = stockLocationCode;
+    }
+
+    public String getStockChannelCode() {
+        return StockChannelCode;
+    }
+
+    public void setStockChannelCode(String stockChannelCode) {
+        StockChannelCode = stockChannelCode;
+    }
+
+    public String getObohOrderStatus() {
+        return ObohOrderStatus;
+    }
+
+    public void setObohOrderStatus(String obohOrderStatus) {
+        ObohOrderStatus = obohOrderStatus;
+    }
+
+    public Double getObohOrderTotAmount() {
+        return ObohOrderTotAmount;
+    }
+
+    public void setObohOrderTotAmount(Double obohOrderTotAmount) {
+        ObohOrderTotAmount = obohOrderTotAmount;
+    }
 
     public String getAclmChannelCode() {
         return AclmChannelCode;

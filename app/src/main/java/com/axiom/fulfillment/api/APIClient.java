@@ -19,6 +19,8 @@ public class APIClient {
 
     private static Retrofit retrofit = null;
     private static Retrofit retrofittoken = null;
+    private static Retrofit retrofitforinvoice = null;
+
     private static UserSharedPreferences pref;
     private Context mContext;
 
@@ -55,8 +57,8 @@ public class APIClient {
                             .build();
                     return chain.proceed(newRequest);
                 }
-            }).readTimeout(30, TimeUnit.SECONDS)
-                    .connectTimeout(30, TimeUnit.SECONDS)
+            }).readTimeout(60, TimeUnit.SECONDS)
+                    .connectTimeout(60, TimeUnit.SECONDS)
                     .addInterceptor(interceptor)
                     .build();
 
@@ -67,5 +69,21 @@ public class APIClient {
                     .build();
         }
         return retrofit;
+    }
+
+    public static Retrofit getClientforinvoice() {
+
+        if (retrofitforinvoice == null) {
+            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+            OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+            retrofitforinvoice = new Retrofit.Builder()
+                    .baseUrl("https://fulfilment.axiomtelecom.com/AxiomFulfillService.svc/")
+                    .client(client)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
+        return retrofitforinvoice;
     }
 }

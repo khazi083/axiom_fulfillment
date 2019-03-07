@@ -6,6 +6,11 @@
     <string name="Shipped_screen">Shipped orders</string>
     <string name="Cancelled_screen">Cancelled orders</string>
     <string name="Delivered_screen">Delivered orders</string>
+    <string name="PreOrder_screen">Pre orders</string>
+    <string name="InProcess_screen">In Process orders</string>
+    <string name="Pending_Screen">Pending RMO</string>
+    <string name="PendingReceving_Screen">Pending Receiving</string>
+    <string name="Posx_Screen">PosX Orders</string>
     <string name="Picked_screen">Picked orders</string>
     <string name="new_screen">New orders</string>
     <string name="Order_Details">Order Details</string>

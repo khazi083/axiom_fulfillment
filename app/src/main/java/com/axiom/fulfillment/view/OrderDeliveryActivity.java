@@ -124,10 +124,9 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setTitle(getString(R.string.Order_Delivery));
         statusCheck();
-        if (checkGooglePlayServices()) {
-            buildGoogleApiClient();
-            createLocationRequest();
-        }
+        buildGoogleApiClient();
+        createLocationRequest();
+
     }
 
     public void statusCheck() {
@@ -163,27 +162,7 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
         locationRequest.setSmallestDisplacement(LOCATION_DISTANCE);
     }
 
-    private boolean checkGooglePlayServices() {
 
-        int checkGooglePlayServices = GooglePlayServicesUtil
-                .isGooglePlayServicesAvailable(this);
-        if (checkGooglePlayServices != ConnectionResult.SUCCESS) {
-            /*
-             * google play services is missing or update is required
-             *  return code could be
-             * SUCCESS,
-             * SERVICE_MISSING, SERVICE_VERSION_UPDATE_REQUIRED,
-             * SERVICE_DISABLED, SERVICE_INVALID.
-             */
-            GooglePlayServicesUtil.getErrorDialog(checkGooglePlayServices,
-                    this, REQUEST_CODE_RECOVER_PLAY_SERVICES).show();
-
-            return false;
-        }
-
-        return true;
-
-    }
 
 
     @Override
@@ -223,7 +202,6 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
                 break;
 
             case R.id.upload:
-                createLocationRequest();
                 uploaddata();
                 break;
 
@@ -439,7 +417,10 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
 
     private void takePhotoFromCamera() {
         Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        File photo = new File(Environment.getExternalStorageDirectory(), orderno + "_" + attachment);
+        int startindex=0;
+        if(orderno.length()>10)
+        startindex=orderno.length()-10;
+        File photo = new File(Environment.getExternalStorageDirectory()+"/Axiom_bikers", orderno.substring(startindex,orderno.length()) + "_" + attachment.replace("image","")+".JPEG");
         intent.putExtra(MediaStore.EXTRA_OUTPUT,
                 Uri.fromFile(photo));
         imageUri = Uri.fromFile(photo);
@@ -452,28 +433,12 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
 
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQUEST_CODE_RECOVER_PLAY_SERVICES) {
-
-            if (resultCode == RESULT_OK) {
-                // Make sure the app is not already connected or attempting to connect
-                if (!mGoogleApiClient.isConnecting() &&
-                        !mGoogleApiClient.isConnected()) {
-                    mGoogleApiClient.connect();
-                }
-            } else if (resultCode == RESULT_CANCELED) {
-//                Toast.makeText(this, "Google Play Services must be installed.",
-//                        Toast.LENGTH_SHORT).show();
-//                finish();
-            }
-            return;
-        }
-
 
         if (resultCode == RESULT_CANCELED) {
             attachment = "null";
             return;
         }
-        if (requestCode == GALLERY) {
+        else if (requestCode == GALLERY) {
             if (data != null) {
                 Uri contentURI = data.getData();
 
@@ -514,7 +479,6 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
                     case "image1":
                         imageview_one.setImageBitmap(thumbnail);
                         base64img1 = convertbase64(thumbnail);
-
                         break;
                     case "image2":
                         imageview_two.setImageBitmap(thumbnail);
@@ -533,24 +497,11 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
         }
     }
 
-
     public static String convertbase64(Bitmap bitmap) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
         return Base64.encodeToString(outputStream.toByteArray(), Base64.DEFAULT);
     }
-
-
-    private void getGoogleApiClient() {
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(OrderDeliveryActivity.this)
-                    .addApi(LocationServices.API)
-                    .addConnectionCallbacks(this)
-                    .build();
-        }
-        mGoogleApiClient.connect();
-    }
-
 
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -558,7 +509,6 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
                 .addApi(LocationServices.API)
                 .build();
     }
-
 
     @Override
     public void onConnected(Bundle bundle) {
@@ -570,11 +520,6 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
             }
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient);
-            if (mLastLocation != null) {
-
-                Toast.makeText(this, "Latitude:" + mLastLocation.getLatitude() + ", Longitude:" + mLastLocation.getLongitude(), Toast.LENGTH_LONG).show();
-
-            }
 
         }
     }

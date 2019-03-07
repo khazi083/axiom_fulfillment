@@ -30,7 +30,6 @@ public class OrderDetailsAdaptor extends RecyclerView.Adapter<OrderDetailsAdapto
         }
     }
 
-
     public OrderDetailsAdaptor(Context ctx,List<OrderItemDetails> deliveryorderList) {
         this.deliveryorderList = deliveryorderList;
         this.ctx=ctx;

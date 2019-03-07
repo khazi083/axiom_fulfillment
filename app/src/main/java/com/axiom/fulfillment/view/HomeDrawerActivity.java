@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -44,7 +43,6 @@ import com.axiom.fulfillment.model.orderApi;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-
 
 import lecho.lib.hellocharts.listener.PieChartOnValueSelectListener;
 import lecho.lib.hellocharts.model.Axis;
@@ -100,7 +98,6 @@ public class HomeDrawerActivity extends BaseActivity {
         pie.setOnValueTouchListener(new ValueTouchListener());
         pendingorder_layout = findViewById(R.id.pending_layout);
         pickedorders_layout = findViewById(R.id.picked_layout);
-
         colchart = findViewById(R.id.colchart);
         backgraph = findViewById(R.id.backgraph);
         backgraph.setOnClickListener(new View.OnClickListener() {
@@ -121,10 +118,10 @@ public class HomeDrawerActivity extends BaseActivity {
                 getDashBoarddata();
                 getmenuList();
                 if (pendingorder_layout.getChildCount() > 0) ;
-                pendingorder_layout.removeAllViews();
+                    pendingorder_layout.removeAllViews();
 
                 if (pickedorders_layout.getChildCount() > 0) ;
-                pickedorders_layout.removeAllViews();
+                    pickedorders_layout.removeAllViews();
                 getPendingorderdata(constants.ORDER_CREATED);
                 getPickedOrderData(constants.ORDER_PICKED);
             }
@@ -206,6 +203,16 @@ public class HomeDrawerActivity extends BaseActivity {
                         startActivity(intent1);
                         return true ;
                     }
+                    else if (expandableListDetail.get(click).get(childPosition).toLowerCase().contains("posx")) {
+                        mDrawerLayout.closeDrawers();
+                        Intent intent1 = new Intent(HomeDrawerActivity.this, PosxOrderList.class);
+                        intent1.putExtra(CHECKTYPE,ERPRICE);
+                        startActivity(intent1);
+                        return true ;
+                    }
+                    else if (expandableListDetail.get(click).get(childPosition).toLowerCase().contains("pre-orders")) {
+                        Key = constants.PREORDER;
+                    }
 
                     else if (expandableListDetail.get(click).get(childPosition).equalsIgnoreCase("Ready to Dispatch")) {
                         Key = constants.order_rtd;
@@ -217,6 +224,21 @@ public class HomeDrawerActivity extends BaseActivity {
                         Key = constants.CANCELLED;
                     } else if (expandableListDetail.get(click).get(childPosition).equalsIgnoreCase("Delivered Orders")) {
                         Key = constants.COMPLETE;
+                    }else if (expandableListDetail.get(click).get(childPosition).equalsIgnoreCase("In Progress")) {
+                        Key = constants.INPROGRESS;
+                    }
+                    if (!Key.isEmpty()) {
+                        mDrawerLayout.closeDrawers();
+                        Intent intent = new Intent(HomeDrawerActivity.this, DispatchOrderList.class);
+                        intent.putExtra(constants.order_type, Key);
+                        startActivity(intent);
+                    }
+                }
+                else if (click.equalsIgnoreCase("Returns")) {
+                  if (expandableListDetail.get(click).get(childPosition).equalsIgnoreCase("Pending RMO")) {
+                        Key = constants.PENDINGRMO;
+                    } else if (expandableListDetail.get(click).get(childPosition).equalsIgnoreCase("Pending Receiving")) {
+                        Key = constants.PENDINGRECIEVING;
                     }
                     if (!Key.isEmpty()) {
                         mDrawerLayout.closeDrawers();
@@ -235,24 +257,6 @@ public class HomeDrawerActivity extends BaseActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
 
     }
-
-//
-//    public static String encrypt(String key, String value) {
-//        try {
-//            IvParameterSpec iv = new IvParameterSpec(key.getBytes("UTF-8"));
-//            SecretKeySpec skeySpec = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
-//            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7PADDING");
-//            cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
-//          //  byte[] encrypted = cipher.doFinal(value.getBytes());
-//            byte[] encrypted= cipher.doFinal(value.getBytes("UTF-8"));
-//           System.out.println("encrypted string: " + Base64.encodeToString(encrypted,Base64.DEFAULT));
-//           return Base64.encodeToString(encrypted,Base64.DEFAULT);
-//        } catch (Exception ex) {
-//            ex.printStackTrace();
-//        }
-//
-//        return null;
-//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -370,13 +374,14 @@ public class HomeDrawerActivity extends BaseActivity {
             @Override
             public void onResponse(Call<DashboardResponse> call, Response<DashboardResponse> response) {
 
+                stopLoader();
                 if (response.body() != null && response.body().getDashboard() != null && response.body().getDashboard().size() > 0) {
                     DashboardResponse responseString = response.body();
                     dashboarddata = responseString.getDashboard();
                     generateData();
 
                 } else if (response.message().equalsIgnoreCase("unauthorized")) {
-                    stopLoader();
+
                     startLoader(getString(R.string.loading), HomeDrawerActivity.this);
                     getToken(HomeDrawerActivity.this);
                     final Handler handler = new Handler();
@@ -484,7 +489,7 @@ public class HomeDrawerActivity extends BaseActivity {
         piedata.setSlicesSpacing(4);
         pie.setPieChartData(piedata);
         mDrawerLayout.setVisibility(View.VISIBLE);
-        stopLoader();
+
     }
 
     private void ExpandableListDataPump(List<menu> menu) {
@@ -579,14 +584,12 @@ public class HomeDrawerActivity extends BaseActivity {
                 HomeDrawerActivity.this.finishAffinity();
             }
         });
-
         noBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialogView.cancel();
             }
         });
-
         dialogView.show();
     }
 
@@ -610,24 +613,20 @@ public class HomeDrawerActivity extends BaseActivity {
         if (mainlayout.getChildCount() > 1) ;
         mainlayout.removeViewsInLayout(1, mainlayout.getChildCount() - 1);
         int sum = 0;
-
         for (int j = 0; j < sourcedata.size(); j++) {
             sum = sum + sourcedata.get(j).getSourceCount();
         }
         List<Column> columns = new ArrayList<Column>();
         List<SubcolumnValue> values;
         for (int i = 0; i < sourcedata.size(); ++i) {
-
             values = new ArrayList<>();
             int colorcode = ChartUtils.pickColor();
             values.add(new SubcolumnValue(sourcedata.get(i).getSourceCount(), colorcode).setLabel(sourcedata.get(i).getObohOrderSource() + "-" + sourcedata.get(i).getSourceCount()));
             Column column = new Column(values);
             column.setHasLabels(true);
             columns.add(column);
-
             View to_add = getLayoutInflater().inflate(R.layout.graphitem,
                     mainlayout, false);
-
             TextView type = to_add.findViewById(R.id.orderitem_type);
             TextView per = to_add.findViewById(R.id.orderitem_per);
             ImageView col = to_add.findViewById(R.id.itemcolor);
@@ -645,7 +644,6 @@ public class HomeDrawerActivity extends BaseActivity {
         columnChartData.setAxisXBottom(axisX);
         columnChartData.setAxisYLeft(axisY);
         columnChartData.setFillRatio(0.5f);
-
         colchart.setColumnChartData(columnChartData);
 
     }

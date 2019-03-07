@@ -3,24 +3,15 @@ package com.axiom.fulfillment.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
+public class Invoice {
 
-public class DashboardResponse {
-
-    @SerializedName("Dashboard")
-    @Expose
-    private List<Dashboard> dashboard = null;
     @SerializedName("Status")
     @Expose
     private Status status;
 
-    public List<Dashboard> getDashboard() {
-        return dashboard;
-    }
-
-    public void setDashboard(List<Dashboard> dashboard) {
-        this.dashboard = dashboard;
-    }
+    @SerializedName("Invoice")
+    @Expose
+    private String Invoice;
 
     public Status getStatus() {
         return status;
@@ -30,4 +21,11 @@ public class DashboardResponse {
         this.status = status;
     }
 
+    public String getInvoice() {
+        return Invoice;
+    }
+
+    public void setInvoice(String invoice) {
+        Invoice = invoice;
+    }
 }

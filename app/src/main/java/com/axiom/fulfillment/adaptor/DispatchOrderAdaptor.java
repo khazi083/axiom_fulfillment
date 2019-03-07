@@ -22,7 +22,7 @@ public class DispatchOrderAdaptor extends RecyclerView.Adapter<DispatchOrderAdap
     Context ctx;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView orderno, cust_name,purchaseno,orderdate,assignon,msource;
+        public TextView orderno, cust_name,purchaseno,orderdate,assignon,msource,seqno;
         RelativeLayout mainlayout;
         ImageView deliveryicon;
 
@@ -36,6 +36,7 @@ public class DispatchOrderAdaptor extends RecyclerView.Adapter<DispatchOrderAdap
             msource=view.findViewById(R.id.source);
             mainlayout=view.findViewById(R.id.mainlayout);
             deliveryicon=view.findViewById(R.id.deliveryicon);
+            seqno=view.findViewById(R.id.seqno);
         }
     }
 
@@ -58,11 +59,21 @@ public class DispatchOrderAdaptor extends RecyclerView.Adapter<DispatchOrderAdap
         DispatchOrderitem or = dispatchOrderitems.get(position);
         holder.orderno.setText(or.getObohOrderNo());
         holder.cust_name.setText(or.getObohCustFullName());
-        holder.purchaseno.setText(String.valueOf(or.getObohOrderAmountTax())+" "+or.getObohCurrency());
-        holder.orderdate.setText(or.getObohOrderDate().replace("T"," "));
-        holder.assignon.setText(or.getObohPartnerOrderNo());
-        holder.msource.setText(or.getObohOrderSource());
+        if(or.getObohOrderAmountTax()!=null)
+            holder.purchaseno.setText(String.valueOf(or.getObohOrderAmountTax())+" "+or.getObohCurrency());
+        else if(or.getObohOrderTotAmount()!=null)
+            holder.purchaseno.setText(String.valueOf(or.getObohOrderTotAmount())+" "+or.getObohCurrency());
 
+        holder.orderdate.setText(or.getObohOrderDate().replace("T"," "));
+        if(or.getObohPartnerOrderNo()!=null && !or.getObohPartnerOrderNo().isEmpty())
+            holder.assignon.setText(or.getObohPartnerOrderNo());
+
+
+        holder.msource.setText(or.getObohOrderSource());
+        if(or.getStockLocationCode()!=null && !or.getStockLocationCode().isEmpty()) {
+            holder.seqno.setVisibility(View.VISIBLE);
+            holder.seqno.setText(or.getStockLocationCode());
+        }
         if(or.getObohOrderSource().contains("HUAWEI"))
             holder.deliveryicon.setImageResource(R.drawable.huaweiksa);
         else if(or.getObohOrderSource().contains("NOON"))
@@ -77,6 +88,8 @@ public class DispatchOrderAdaptor extends RecyclerView.Adapter<DispatchOrderAdap
             holder.deliveryicon.setImageResource(R.drawable.htcuae);
         else if(or.getObohOrderSource().contains("WADI"))
             holder.deliveryicon.setImageResource(R.drawable.wadiksa);
+        else if(or.getObohOrderSource().contains("SAMSUNG"))
+            holder.deliveryicon.setImageResource(R.drawable.samsung);
         holder.mainlayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

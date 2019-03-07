@@ -17,7 +17,7 @@ public class PriceAdaptor extends RecyclerView.Adapter<PriceAdaptor.MyViewHolder
         List<Price> price;
         Context ctx;
 
-public class MyViewHolder extends RecyclerView.ViewHolder {
+    public class MyViewHolder extends RecyclerView.ViewHolder {
     public TextView stockdisc,stockchannel, stockqty;
 
     public MyViewHolder(View view) {
@@ -25,8 +25,8 @@ public class MyViewHolder extends RecyclerView.ViewHolder {
         stockdisc = view.findViewById(R.id.stock_disc);
         stockchannel = view.findViewById(R.id.stockchannel);
         stockqty = view.findViewById(R.id.stock_qty);
+     }
     }
-}
 
 
     public PriceAdaptor(Context ctx, List<Price> price) {

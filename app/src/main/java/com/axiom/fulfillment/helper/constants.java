@@ -9,6 +9,11 @@ public class constants {
     public static final String ORDER_CANCELLED = "ORDER_CANCELLED";
     public static final String order_rtd = "READYTODISPATCH";
     public static final String AWBCREATED = "AWBCREATED";
+    public static final String INPROGRESS = "PENDING";
+    public static final String PENDINGRMO = "PENDINGSRMO";
+    public static final String PREORDER = "PRE-ORDER";
+    public static final String PENDINGRECIEVING = "PENDINGSRRECEIVING";
+    public static final String POSX = "POSXORDERS";
     public static final String SHIPPED = "SHIPPED";
     public static final String CANCELLED = "CANCELLED";
     public static final String COMPLETE = "COMPLETE";
@@ -20,9 +25,18 @@ public class constants {
     public static final String usercode = "usercode";
     public static final String ObohSeq = "ObohSeq";
     public static final String CHANNELCODE = "CHANNELCODE";
+    public static final String POSSTOCKLOC = "STOCKLOC";
+    public static final String POSORDERSTATUS = "status";
+    public static final String DELIVERGPS = "DELIVERGPS";
+    public static final String PICKGPS = "PICKGPS";
+    public static final String PICKLOCATION = "PICKLOCATION";
+
+
+    public static final String POSPURCHASENO = "POSPURCHASENO";
     public static final String SOURCE = "SOURCE";
     public static final String CHECKTYPE = "Check_type";
     public static final String ERPSTOCK = "Erp_stock";
     public static final String ERPRICE = "Erp_price";
+    public static final String ENCRYPT_KEY = "7061737323313233";
 
 }

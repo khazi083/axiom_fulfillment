@@ -5,21 +5,20 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class DashboardResponse {
-
-    @SerializedName("Dashboard")
+public class ShipmentReport {
+    @SerializedName("report")
     @Expose
-    private List<Dashboard> dashboard = null;
+    private List<Report> report = null;
     @SerializedName("Status")
     @Expose
     private Status status;
 
-    public List<Dashboard> getDashboard() {
-        return dashboard;
+    public List<Report> getReport() {
+        return report;
     }
 
-    public void setDashboard(List<Dashboard> dashboard) {
-        this.dashboard = dashboard;
+    public void setReport(List<Report> report) {
+        this.report = report;
     }
 
     public Status getStatus() {
@@ -29,5 +28,4 @@ public class DashboardResponse {
     public void setStatus(Status status) {
         this.status = status;
     }
-
 }

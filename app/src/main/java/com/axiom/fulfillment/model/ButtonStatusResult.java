@@ -15,6 +15,53 @@ public class ButtonStatusResult {
     @Expose
     private Boolean showInvoice;
 
+    @SerializedName("CanAirwayBill")
+    @Expose
+    private Boolean CanAirwayBill;
+    @SerializedName("ShowAirwayBill")
+    @Expose
+    private Boolean ShowAirwayBill;
+
+    @SerializedName("ShowAxiomBikerDelivery")
+    @Expose
+    private Boolean ShowAxiomBikerDelivery;
+
+    @SerializedName("ShowShipmentData")
+    @Expose
+    private Boolean ShowShipmentData;
+
+    public Boolean getShowShipmentData() {
+        return ShowShipmentData;
+    }
+
+    public void setShowShipmentData(Boolean showShipmentData) {
+        ShowShipmentData = showShipmentData;
+    }
+
+    public Boolean getCanAirwayBill() {
+        return CanAirwayBill;
+    }
+
+    public void setCanAirwayBill(Boolean canAirwayBill) {
+        CanAirwayBill = canAirwayBill;
+    }
+
+    public Boolean getShowAirwayBill() {
+        return ShowAirwayBill;
+    }
+
+    public void setShowAirwayBill(Boolean showAirwayBill) {
+        ShowAirwayBill = showAirwayBill;
+    }
+
+    public Boolean getShowAxiomBikerDelivery() {
+        return ShowAxiomBikerDelivery;
+    }
+
+    public void setShowAxiomBikerDelivery(Boolean showAxiomBikerDelivery) {
+        ShowAxiomBikerDelivery = showAxiomBikerDelivery;
+    }
+
     public Status getStatus() {
         return status;
     }

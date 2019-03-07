@@ -48,6 +48,43 @@ public class deliveryorder {
     @Expose
     private String employeeName;
 
+    @SerializedName("OrderDeliveredGps")
+    @Expose
+    private String OrderDeliveredGps;
+
+    @SerializedName("OrderPickedGps")
+    @Expose
+    private String OrderPickedGps;
+
+
+    @SerializedName("OrdPickOrderLocation")
+    @Expose
+    private String OrdPickOrderLocation;
+
+    public String getOrdPickOrderLocation() {
+        return OrdPickOrderLocation;
+    }
+
+    public void setOrdPickOrderLocation(String ordPickOrderLocation) {
+        OrdPickOrderLocation = ordPickOrderLocation;
+    }
+
+    public String getOrderDeliveredGps() {
+        return OrderDeliveredGps;
+    }
+
+    public void setOrderDeliveredGps(String orderDeliveredGps) {
+        OrderDeliveredGps = orderDeliveredGps;
+    }
+
+    public String getOrderPickedGps() {
+        return OrderPickedGps;
+    }
+
+    public void setOrderPickedGps(String orderPickedGps) {
+        OrderPickedGps = orderPickedGps;
+    }
+
     public Integer getOaboId() {
         return oaboId;
     }

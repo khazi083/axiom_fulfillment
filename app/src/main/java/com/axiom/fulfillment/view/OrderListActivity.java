@@ -9,6 +9,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.axiom.fulfillment.R;
 import com.axiom.fulfillment.adaptor.OrderItemAdaptor;
@@ -39,6 +40,7 @@ public class OrderListActivity extends BaseActivity implements OrderActionListne
     UserSharedPreferences upref;
     String key = "";
     EditText searchtext;
+    private TextView count;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,7 @@ public class OrderListActivity extends BaseActivity implements OrderActionListne
             key = getIntent().getStringExtra(constants.order_type);
 
         recyclerView = findViewById(R.id.recycler_view);
+        count=findViewById(R.id.count);
         upref = new UserSharedPreferences(this);
         getToken(this);
         searchtext = findViewById(R.id.search_order);
@@ -140,6 +143,7 @@ public class OrderListActivity extends BaseActivity implements OrderActionListne
                         return;
                     }
 
+                    count.setText("Total Count : "+ orderList.size());
                     mAdapter = new OrderItemAdaptor(OrderListActivity.this, orderList, OrderListActivity.this);
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
                     recyclerView.setLayoutManager(mLayoutManager);
@@ -164,6 +168,9 @@ public class OrderListActivity extends BaseActivity implements OrderActionListne
             intent.putExtra(constants.OADBID, orderList.get(position).getOadbId());
             intent.putExtra(constants.ORDERNO, orderList.get(position).getObohOrderNo());
             intent.putExtra(constants.ObohSeq, "");
+            intent.putExtra(constants.DELIVERGPS,  orderList.get(position).getOrderDeliveredGps());
+            intent.putExtra(constants.PICKGPS, orderList.get(position).getOrderPickedGps());
+            intent.putExtra(constants.PICKLOCATION,  orderList.get(position).getOrdPickOrderLocation());
             intent.putExtra(constants.User_name, upref.getFirstName());
             intent.putExtra(constants.userid, upref.getUserId());
             intent.putExtra(constants.usercode, upref.getKeyUserCode());
@@ -175,6 +182,9 @@ public class OrderListActivity extends BaseActivity implements OrderActionListne
             intent.putExtra(constants.OADBID, searchorderList.get(position).getOadbId());
             intent.putExtra(constants.ORDERNO, searchorderList.get(position).getObohOrderNo());
             intent.putExtra(constants.ObohSeq, "");
+            intent.putExtra(constants.DELIVERGPS,  searchorderList.get(position).getOrderDeliveredGps());
+            intent.putExtra(constants.PICKLOCATION,  searchorderList.get(position).getOrdPickOrderLocation());
+            intent.putExtra(constants.PICKGPS, searchorderList.get(position).getOrderPickedGps());
             intent.putExtra(constants.User_name, upref.getFirstName());
             intent.putExtra(constants.userid, upref.getUserId());
             intent.putExtra(constants.usercode, upref.getKeyUserCode());
