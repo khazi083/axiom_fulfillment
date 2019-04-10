@@ -16,11 +16,9 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class APIClient {
-
     private static Retrofit retrofit = null;
     private static Retrofit retrofittoken = null;
     private static Retrofit retrofitforinvoice = null;
-
     private static UserSharedPreferences pref;
     private Context mContext;
 
@@ -44,7 +42,6 @@ public class APIClient {
     }
 
     public static Retrofit getClient() {
-
         if (retrofit == null) {
             HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -61,7 +58,6 @@ public class APIClient {
                     .connectTimeout(60, TimeUnit.SECONDS)
                     .addInterceptor(interceptor)
                     .build();
-
             retrofit = new Retrofit.Builder()
                     .baseUrl("https://ecommerce.axiomtelecom.com:555/fulfilment/live/")
                     .client(client)
@@ -72,7 +68,6 @@ public class APIClient {
     }
 
     public static Retrofit getClientforinvoice() {
-
         if (retrofitforinvoice == null) {
             HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);

@@ -181,6 +181,9 @@ public class HomeDrawerActivity extends BaseActivity {
                     } else if (expandableListDetail.get(click).get(childPosition).equalsIgnoreCase("Cancelled Orders")) {
                         Key = constants.ORDER_CANCELLED;
                     }
+                    else if (expandableListDetail.get(click).get(childPosition).equalsIgnoreCase("Postponed Orders")) {
+                        Key = constants.ORDER_POSTPONE;
+                    }
                     if (!Key.isEmpty()) {
                         mDrawerLayout.closeDrawers();
                         Intent intent = new Intent(HomeDrawerActivity.this, OrderListActivity.class);
@@ -292,20 +295,15 @@ public class HomeDrawerActivity extends BaseActivity {
                     PendingOrderList = response.body().getBikerOrders();
 
                     if (pendingorder_layout.getChildCount() > 1) ;
-                    pendingorder_layout.removeAllViews();
-
-
+                        pendingorder_layout.removeAllViews();
                     addpendingheader();
                     if (PendingOrderList.size() == 0) {
                         nopendingheader();
-
                         return;
                     }
                     int temp_size = 5;
                     if (PendingOrderList.size() < temp_size)
                         temp_size = PendingOrderList.size();
-
-
                     for (int i = 0; i < temp_size; i++) {
                         addPendingOrders(i);
                     }
@@ -323,13 +321,11 @@ public class HomeDrawerActivity extends BaseActivity {
     }
 
     private void getPickedOrderData(String key) {
-
         APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
         orderApi ord = new orderApi();
         ord.setstaus(key);
         ord.setOadbEmployeeId(upref.getKeyEmpCode());
         ord.setUserDetails(new UserDetails(upref.getUserId(), upref.getFirstName()));
-
         Call<bikerorder> stringCall = apiService.getorderlist(ord);
         stringCall.enqueue(new Callback<bikerorder>() {
             @Override
@@ -434,13 +430,10 @@ public class HomeDrawerActivity extends BaseActivity {
     }
 
     private void generateData() {
-
         List<SliceValue> values = new ArrayList<SliceValue>();
         if (mainlayout.getChildCount() > 1) ;
         mainlayout.removeViewsInLayout(1, mainlayout.getChildCount() - 1);
-
         int sum = 0;
-
         for (int j = 0; j < dashboarddata.size(); j++) {
             sum = sum + dashboarddata.get(j).getStatusCount();
         }
@@ -458,7 +451,6 @@ public class HomeDrawerActivity extends BaseActivity {
             } else if (dashboarddata.get(i).getOrderStatus().contains("POST")) {
                 color = Color.YELLOW;
             }
-
 
             View to_add = getLayoutInflater().inflate(R.layout.graphitem,
                     mainlayout, false);
@@ -546,11 +538,7 @@ public class HomeDrawerActivity extends BaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
 
-        // Activate the navigation drawer toggle
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
@@ -645,7 +633,6 @@ public class HomeDrawerActivity extends BaseActivity {
         columnChartData.setAxisYLeft(axisY);
         columnChartData.setFillRatio(0.5f);
         colchart.setColumnChartData(columnChartData);
-
     }
 
 
@@ -671,7 +658,6 @@ public class HomeDrawerActivity extends BaseActivity {
                 intent.putExtra(constants.userid, upref.getUserId());
                 intent.putExtra(constants.usercode, upref.getKeyUserCode());
                 intent.putExtra(constants.order_type, constants.ORDER_CREATED);
-
                 startActivity(intent);
             }
         });
@@ -682,13 +668,10 @@ public class HomeDrawerActivity extends BaseActivity {
     @Override
     public void onResume() {
         super.onResume();
-
-
         if (pendingorder_layout.getChildCount() > 0) ;
-        pendingorder_layout.removeAllViews();
-
+            pendingorder_layout.removeAllViews();
         if (pickedorders_layout.getChildCount() > 0) ;
-        pickedorders_layout.removeAllViews();
+            pickedorders_layout.removeAllViews();
         getPendingorderdata(constants.ORDER_CREATED);
         getPickedOrderData(constants.ORDER_PICKED);
     }

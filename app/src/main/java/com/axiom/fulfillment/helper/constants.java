@@ -7,6 +7,7 @@ public class constants {
     public static final String ORDER_PICKED = "ORDER_PICKED";
     public static final String ORDER_DELIVERED = "ORDER_DELIVERED";
     public static final String ORDER_CANCELLED = "ORDER_CANCELLED";
+    public static final String ORDER_POSTPONE = "ORDER_POSTPONE";
     public static final String order_rtd = "READYTODISPATCH";
     public static final String AWBCREATED = "AWBCREATED";
     public static final String INPROGRESS = "PENDING";
@@ -30,8 +31,6 @@ public class constants {
     public static final String DELIVERGPS = "DELIVERGPS";
     public static final String PICKGPS = "PICKGPS";
     public static final String PICKLOCATION = "PICKLOCATION";
-
-
     public static final String POSPURCHASENO = "POSPURCHASENO";
     public static final String SOURCE = "SOURCE";
     public static final String CHECKTYPE = "Check_type";

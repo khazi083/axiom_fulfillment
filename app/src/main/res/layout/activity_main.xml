@@ -9,6 +9,9 @@
     app:contentInsetStart="0dp"
     app:contentInsetStartWithNavigation="0dp">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -136,7 +139,7 @@
 
     </RelativeLayout>
 
-
+    </ScrollView>
     <ExpandableListView
         android:id="@+id/navList"
         android:layout_width="250dp"

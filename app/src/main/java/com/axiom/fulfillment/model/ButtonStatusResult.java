@@ -30,6 +30,19 @@ public class ButtonStatusResult {
     @Expose
     private Boolean ShowShipmentData;
 
+
+    @SerializedName("ShowCourierTracker")
+    @Expose
+    private Boolean ShowCourierTracker;
+
+    public Boolean getShowCourierTracker() {
+        return ShowCourierTracker;
+    }
+
+    public void setShowCourierTracker(Boolean showCourierTracker) {
+        ShowCourierTracker = showCourierTracker;
+    }
+
     public Boolean getShowShipmentData() {
         return ShowShipmentData;
     }

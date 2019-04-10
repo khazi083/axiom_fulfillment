@@ -1,9 +1,10 @@
 package com.axiom.fulfillment.view;
-
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -24,6 +25,9 @@ import com.axiom.fulfillment.helper.UserSharedPreferences;
 import com.axiom.fulfillment.model.ButtonStatus;
 import com.axiom.fulfillment.model.ErpPriceCheck;
 import com.axiom.fulfillment.model.ErpStockInput;
+import com.axiom.fulfillment.model.ItemDetail;
+import com.axiom.fulfillment.model.ItemdescInput;
+import com.axiom.fulfillment.model.ItemdescList;
 import com.axiom.fulfillment.model.LocationMaster;
 import com.axiom.fulfillment.model.Locationlist;
 import com.axiom.fulfillment.model.Organization;
@@ -51,9 +55,10 @@ import static com.axiom.fulfillment.helper.constants.ERPSTOCK;
 public class Erp_Stock extends BaseActivity  {
     Spinner org_list,channel;
     AutoCompleteTextView autolocations;
-    EditText itemcode;
+    AutoCompleteTextView itemcode;
     UserSharedPreferences upref;
     private List<Organization> organization;
+    private List<ItemDetail> itemDetail;
     List<org_Channels> channellist;
     List<LocationMaster> Location;
     List<Stockitem> Stocks;
@@ -68,6 +73,8 @@ public class Erp_Stock extends BaseActivity  {
     private View diver;
     TextView pd_id, qty_price;
     String Check_type;
+    List<String> suggestions = new ArrayList<>();
+    ArrayAdapter<String> adapter ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +84,31 @@ public class Erp_Stock extends BaseActivity  {
         channel=findViewById(R.id.channel);
         autolocations=findViewById(R.id.locationlist);
         itemcode=findViewById(R.id.itemcode);
+
+        adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, suggestions);
+        itemcode.setAdapter(adapter);
+        itemcode.setThreshold(3);
+
+        itemcode.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                retrieveData(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                //this will call your method every time the user stops typing, if you want to call it for each letter, call it in onTextChanged
+
+            }
+        });
+
+
         stocksearchheader=findViewById(R.id.stocksearchheader);
         diver=findViewById(R.id.diver);
         pd_id=findViewById(R.id.pd_id);
@@ -193,14 +225,51 @@ public class Erp_Stock extends BaseActivity  {
 
             }
         });
+    }
 
+
+    private void retrieveData(String s){
+        APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
+        ItemdescInput input = new ItemdescInput();
+        input.setProductDesc(s);
+        input.setUserDetails(new UserDetails(upref.getUserId(), upref.getFirstName(), upref.getKeyUserCode(), upref.getKeyEmpCode()));
+        Call<ItemdescList> stringCall = apiService.getItemdesc(input);
+        stringCall.enqueue(new Callback<ItemdescList>() {
+            @Override
+            public void onResponse(Call<ItemdescList> call, Response<ItemdescList> response) {
+                stopLoader();
+                if (response.body()!=null && response.body().getStatus().getOutResult()) {
+                    itemDetail = response.body().getItemDetail();
+                    suggestions.clear();
+                    for (int i = 0; i < itemDetail.size(); i++)
+                        suggestions.add(itemDetail.get(i).getItmrItemDescription());
+                    adapter = new ArrayAdapter<>(Erp_Stock.this,
+                            android.R.layout.simple_dropdown_item_1line, suggestions);
+                    itemcode.setAdapter(adapter);
+                } else {
+                    ShowToast("Error :" + response.body().getStatus().getOutMessage(), Erp_Stock.this);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ItemdescList> call, Throwable t) {
+                stopLoader();
+                ShowToast(getString(R.string.api_fail), Erp_Stock.this);
+            }
+        });
 
     }
 
     private void PriceCheck() {
 
         int locationPos=-1;
-        if(locationname.contains( autolocations.getText().toString())){
+
+        if(!itemcode.getText().toString().isEmpty()){
+            if(locationname.contains( autolocations.getText().toString())){
+                locationPos=locationname.indexOf(autolocations.getText().toString());
+            }
+        }
+        else if(locationname.contains( autolocations.getText().toString())){
             locationPos=locationname.indexOf(autolocations.getText().toString());
         }
         else {
@@ -208,14 +277,19 @@ public class Erp_Stock extends BaseActivity  {
             return;
         }
         try {
-
-            if (org_list.getSelectedItemPosition() > 0 && channel.getSelectedItemPosition() > 0 && locationPos >= 0) {
                 APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
                 ErpPriceCheck input = new ErpPriceCheck();
-                input.setAclmChannelCode(channellist.get(channel.getSelectedItemPosition() - 1).getAclmChannelCode());
-                input.setAlnmLocationCode(Location.get(locationPos).getAlnmLocationCode());
-                if (!itemcode.getText().toString().isEmpty())
-                    input.setItmrItemCode(itemcode.getText().toString());
+                if(channel.getSelectedItemPosition()>0)
+                    input.setAclmChannelCode(channellist.get(channel.getSelectedItemPosition() - 1).getAclmChannelCode());
+                if(locationPos!=-1)
+                    input.setAlnmLocationCode(Location.get(locationPos).getAlnmLocationCode());
+                if (!itemcode.getText().toString().isEmpty()) {
+                    for(int i=0; i< suggestions.size();i++){
+                        if(itemcode.getText().toString().equalsIgnoreCase(suggestions.get(i))){
+                            input.setItmrItemCode(itemDetail.get(i).getItmrItemCode());
+                        }
+                    }
+                }
                 input.setAomsOrganizationCode(organization.get(org_list.getSelectedItemPosition() - 1).getAomsOrganizationCode());
                 Call<StockPriceList> stringCall = apiService.getStockPrice(input);
                 startLoader("loading Product list", this);
@@ -241,7 +315,6 @@ public class Erp_Stock extends BaseActivity  {
                         ShowToast(getString(R.string.api_fail), Erp_Stock.this);
                     }
                 });
-            }
         }
         catch (Exception e){
             stopLoader();
@@ -263,7 +336,12 @@ public class Erp_Stock extends BaseActivity  {
 
     private void SearchStock() {
         int locationPos=-1;
-        if(locationname.contains( autolocations.getText().toString())){
+        if(!itemcode.getText().toString().isEmpty()){
+            if(locationname.contains( autolocations.getText().toString())){
+                locationPos=locationname.indexOf(autolocations.getText().toString());
+            }
+        }
+        else if(locationname.contains( autolocations.getText().toString())){
             locationPos=locationname.indexOf(autolocations.getText().toString());
         }
         else {
@@ -271,13 +349,20 @@ public class Erp_Stock extends BaseActivity  {
             return;
         }
 
-       if(org_list.getSelectedItemPosition()>0 && channel.getSelectedItemPosition()>0 && locationPos>=0){
+//       if(org_list.getSelectedItemPosition()>0 && channel.getSelectedItemPosition()>0 && locationPos>=0){
            APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
            ErpStockInput input = new ErpStockInput();
-           input.setAclmChannel(channellist.get(channel.getSelectedItemPosition()-1).getAclmChannelCode());
-           input.setAlnmLocationCode(Location.get(locationPos).getAlnmLocationCode());
-           if(!itemcode.getText().toString().isEmpty())
-           input.setProductCode(itemcode.getText().toString());
+           if(channel.getSelectedItemPosition()>0)
+            input.setAclmChannel(channellist.get(channel.getSelectedItemPosition()-1).getAclmChannelCode());
+           if(locationPos!=-1)
+            input.setAlnmLocationCode(Location.get(locationPos).getAlnmLocationCode());
+           if (!itemcode.getText().toString().isEmpty()) {
+               for(int i=0; i< suggestions.size();i++){
+                   if(itemcode.getText().toString().equalsIgnoreCase(suggestions.get(i))){
+                       input.setProductCode(itemDetail.get(i).getItmrItemCode());
+                   }
+               }
+           }
            input.setUserDetails(new UserDetails(upref.getUserId(), upref.getFirstName(), upref.getKeyUserCode(), upref.getKeyEmpCode()));
            Call<StockList> stringCall = apiService.getErpStock(input);
            startLoader("loading Product list", this);
@@ -302,7 +387,7 @@ public class Erp_Stock extends BaseActivity  {
                    ShowToast(getString(R.string.api_fail), Erp_Stock.this);
                }
            });
-       }
+//       }
     }
 
     private void initview() {
@@ -329,7 +414,6 @@ public class Erp_Stock extends BaseActivity  {
                 return super.onOptionsItemSelected(item);
         }
     }
-
 
     private void getorglist() {
         APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
@@ -363,7 +447,6 @@ public class Erp_Stock extends BaseActivity  {
             }
         });
     }
-
 
     private void getchannellist(String orgcode,String bizunit) {
         APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);

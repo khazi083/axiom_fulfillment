@@ -1,7 +1,6 @@
 package com.axiom.fulfillment.view;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,6 +14,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -23,11 +23,13 @@ import android.support.v7.app.AlertDialog;
 import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.axiom.fulfillment.R;
@@ -41,8 +43,6 @@ import com.axiom.fulfillment.model.BikerRequest;
 import com.axiom.fulfillment.model.CommonApiResponse;
 import com.axiom.fulfillment.model.DeliveryRequest;
 import com.axiom.fulfillment.model.UserDetails;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -60,13 +60,11 @@ import retrofit2.Response;
 public class OrderDeliveryActivity extends BaseActivity implements View.OnClickListener,
         GoogleApiClient.ConnectionCallbacks {
 
-
     Button Btnimage1, Btnimage2, Btnimage3, upload;
     public static int GALLERY = 501;
     public static int CAMERA = 602;
     private String attachment = "null";
     private ImageView imageview_one, imageview_two, imageview_three;
-    private static int REQUEST_CODE_RECOVER_PLAY_SERVICES = 200;
     String base64img1, base64img2, base64img3;
     int OABOID, OADBID;
     String orderno, cust_name;
@@ -79,6 +77,7 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private LocationRequest locationRequest;
+    ScrollView scrollview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +103,7 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
         Btnimage2 = findViewById(R.id.btmimage2);
         Btnimage3 = findViewById(R.id.btmimage3);
         upload = findViewById(R.id.upload);
+        scrollview=findViewById(R.id.scrollview);
         customer_name = findViewById(R.id.cust_name);
         customer_name.setText(cust_name);
         order_no = findViewById(R.id.order_no);
@@ -127,6 +127,27 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
         buildGoogleApiClient();
         createLocationRequest();
 
+        mSignature.setOnTouchListener(new View.OnTouchListener(){
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                int action = motionEvent.getAction();
+                switch (action){
+                    case MotionEvent.ACTION_DOWN:
+                        // Disable the scroll view to intercept the touch event
+                        scrollview.requestDisallowInterceptTouchEvent(true);
+                        return false;
+                    case MotionEvent.ACTION_UP:
+                        // Allow scroll View to interceot the touch event
+                        scrollview.requestDisallowInterceptTouchEvent(false);
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        scrollview.requestDisallowInterceptTouchEvent(true);
+                        return false;
+                    default:
+                        return true;
+                }
+            }
+        });
     }
 
     public void statusCheck() {
@@ -424,16 +445,15 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
         intent.putExtra(MediaStore.EXTRA_OUTPUT,
                 Uri.fromFile(photo));
         imageUri = Uri.fromFile(photo);
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
         startActivityForResult(intent, CAMERA);
     }
 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         super.onActivityResult(requestCode, resultCode, data);
-
-
         if (resultCode == RESULT_CANCELED) {
             attachment = "null";
             return;
@@ -458,7 +478,6 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
                             base64img3 = convertbase64(bitmap);
                             break;
                     }
-
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -547,7 +566,6 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
         if (mGoogleApiClient != null) {
             mGoogleApiClient.disconnect();
         }
-
     }
 }
 

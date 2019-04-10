@@ -67,6 +67,9 @@ public class OrderListActivity extends BaseActivity implements OrderActionListne
             getSupportActionBar().setTitle(getString(R.string.Delivered_screen));
         else if (key.equalsIgnoreCase(constants.ORDER_CANCELLED))
             getSupportActionBar().setTitle(getString(R.string.Cancelled_screen));
+        else if (key.equalsIgnoreCase(constants.ORDER_POSTPONE))
+            getSupportActionBar().setTitle(getString(R.string.Postponed_screen));
+
 
         searchtext.addTextChangedListener(new TextWatcher() {
             @Override
@@ -81,7 +84,6 @@ public class OrderListActivity extends BaseActivity implements OrderActionListne
 
             @Override
             public void afterTextChanged(Editable s) {
-
                 if (s.length() == 0) {
                     mAdapter = new OrderItemAdaptor(OrderListActivity.this, orderList, OrderListActivity.this);
                     recyclerView.setAdapter(mAdapter);
@@ -106,7 +108,6 @@ public class OrderListActivity extends BaseActivity implements OrderActionListne
                     searchorderList.add(order);
                 }
             }
-
         }
     }
 
@@ -142,7 +143,6 @@ public class OrderListActivity extends BaseActivity implements OrderActionListne
                         finish();
                         return;
                     }
-
                     count.setText("Total Count : "+ orderList.size());
                     mAdapter = new OrderItemAdaptor(OrderListActivity.this, orderList, OrderListActivity.this);
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());

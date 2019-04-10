@@ -5,6 +5,7 @@
     <string name="AWB_screen">AWB Created</string>
     <string name="Shipped_screen">Shipped orders</string>
     <string name="Cancelled_screen">Cancelled orders</string>
+    <string name="Postponed_screen">Postponed orders</string>
     <string name="Delivered_screen">Delivered orders</string>
     <string name="PreOrder_screen">Pre orders</string>
     <string name="InProcess_screen">In Process orders</string>

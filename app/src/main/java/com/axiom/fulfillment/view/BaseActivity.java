@@ -1,5 +1,4 @@
 package com.axiom.fulfillment.view;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
@@ -13,7 +12,6 @@ import com.axiom.fulfillment.model.tokenresponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
 
 public class BaseActivity extends AppCompatActivity {
 

@@ -14,11 +14,9 @@ import android.widget.TextView;
 import com.axiom.fulfillment.R;
 
 public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
-
     private Context context;
     private List<String> expandableListTitle;
     private LinkedHashMap<String, List<String>> expandableListDetail;
-
 
     public CustomExpandableListAdapter(Context context, List<String> expandableListTitle,
                                        LinkedHashMap<String, List<String>> expandableListDetail) {
@@ -37,7 +35,6 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
     public long getChildId(int listPosition, int expandedListPosition) {
         return expandedListPosition;
     }
-
 
     @Override
     public View getChildView(int listPosition, final int expandedListPosition,

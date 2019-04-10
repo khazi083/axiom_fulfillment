@@ -6,8 +6,10 @@ import com.axiom.fulfillment.model.ButtonStatusResult;
 import com.axiom.fulfillment.model.CancelOrder;
 import com.axiom.fulfillment.model.CancelPosxOrder;
 import com.axiom.fulfillment.model.CommonApiResponse;
+import com.axiom.fulfillment.model.CourierDetails;
 import com.axiom.fulfillment.model.CourierList;
 import com.axiom.fulfillment.model.CourierListInput;
+import com.axiom.fulfillment.model.CourierOrder;
 import com.axiom.fulfillment.model.CourierdispatchResponse;
 import com.axiom.fulfillment.model.DashboardResponse;
 import com.axiom.fulfillment.model.DeliveryRequest;
@@ -16,6 +18,8 @@ import com.axiom.fulfillment.model.ErpPriceCheck;
 import com.axiom.fulfillment.model.ErpStockInput;
 import com.axiom.fulfillment.model.Invoice;
 import com.axiom.fulfillment.model.InvoiceInput;
+import com.axiom.fulfillment.model.ItemdescInput;
+import com.axiom.fulfillment.model.ItemdescList;
 import com.axiom.fulfillment.model.Locationlist;
 import com.axiom.fulfillment.model.OrderDetailsInput;
 import com.axiom.fulfillment.model.Order_details;
@@ -116,6 +120,10 @@ public interface APIInterface {
     @POST("api/Stocks/GetErpStockOnHand")
     Call<StockList> getErpStock(@Body ErpStockInput input);
 
+    @POST("api/products/search")
+    Call<ItemdescList> getItemdesc(@Body ItemdescInput input);
+
+
     @POST("api/Pricing/GetRpmPrices")
     Call<StockPriceList> getStockPrice(@Body ErpPriceCheck input);
 
@@ -131,4 +139,10 @@ public interface APIInterface {
 
     @POST("api/active/order/cancel")
     Call<CommonApiResponse> cancelPosxOrder(@Body CancelPosxOrder userdata);
+
+    @POST("api/logistics/IntegratedCourierTracker")
+    Call<CourierDetails> shipmentTracker(@Body CourierOrder input);
+
+    @POST("DeliveryReceipt")
+    Call<Invoice> getDeliveryReport(@Body InvoiceInput input);
 }

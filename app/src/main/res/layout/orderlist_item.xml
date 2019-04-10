@@ -22,9 +22,17 @@
             android:layout_alignParentStart="true"
             android:src="@drawable/axiomlogonew3"/>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/deliveryicon"
+            android:orientation="horizontal"
+            android:weightSum="6">
+
     <LinearLayout
         android:id="@+id/main3"
-        android:layout_width="230dp"
+        android:layout_width="0dp"
+        android:layout_weight="3"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@+id/deliveryicon"
         android:layout_marginStart="15dp"
@@ -43,8 +51,8 @@
         android:id="@+id/orderno"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxLines="1"
-        android:textSize="16sp"
+
+        android:textSize="14sp"
         android:textStyle="bold" />
 
     </LinearLayout>
@@ -88,10 +96,10 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_toEndOf="@+id/main3"
+        android:layout_width="0dp"
+        android:layout_weight="3"
         android:paddingStart="20dp"
         >
     <LinearLayout
@@ -150,6 +158,8 @@
     </LinearLayout>
 
     </LinearLayout>
+
+        </LinearLayout>
 
     <Button
         android:layout_width="10dp"

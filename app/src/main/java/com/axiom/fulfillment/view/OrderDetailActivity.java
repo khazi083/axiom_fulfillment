@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 
 import com.axiom.fulfillment.R;
+import com.axiom.fulfillment.adaptor.CourierTRackerAdaptor;
 import com.axiom.fulfillment.adaptor.OrderDetailsAdaptor;
 import com.axiom.fulfillment.adaptor.PaymentDetailsAdaptor;
 import com.axiom.fulfillment.api.APIClient;
@@ -28,9 +29,11 @@ import com.axiom.fulfillment.model.ButtonStatusResult;
 import com.axiom.fulfillment.model.CancelOrder;
 import com.axiom.fulfillment.model.CancelPosxOrder;
 import com.axiom.fulfillment.model.Courier;
+import com.axiom.fulfillment.model.CourierDetails;
 import com.axiom.fulfillment.model.CourierList;
 import com.axiom.fulfillment.model.CourierListInput;
 import com.axiom.fulfillment.model.CourierOrder;
+import com.axiom.fulfillment.model.CourierTracker;
 import com.axiom.fulfillment.model.CourierdispatchResponse;
 import com.axiom.fulfillment.model.DeliveryRequest;
 import com.axiom.fulfillment.model.Invoice;
@@ -52,6 +55,7 @@ import com.google.android.gms.location.LocationServices;
 
 
 import android.os.Environment;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
@@ -104,8 +108,8 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
     OrderDetailsAdaptor orderDetailsAdaptor;
     PaymentDetailsAdaptor paymentDetailsAdaptor;
     RelativeLayout main;
-    Button deliver, pick, cancel, assign_biker,shipmentbill,maps;
-    Button assign_courier, reshedule, invoice,order_cancel;
+    Button deliver, pick, cancel, assign_biker,shipmentbill,maps,shipmenttracker;
+    Button assign_courier, reshedule, invoice,order_cancel,deliveryreciept;
     int req_code = 201;
     private List<Biker> bikers;
     private List<SystemCourier> systemCouriers;
@@ -117,7 +121,6 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
     private LocationRequest locationRequest;
     private LinearLayout layout_comments, layout_remarks,layout_pickloc;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,7 +130,6 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
         ordernotxt = findViewById(R.id.morderno);
         orderdate = findViewById(R.id.morderdate);
         sorce = findViewById(R.id.msource);
-
         purchaseno = findViewById(R.id.purchaseno);
         remarks = findViewById(R.id.mremarks);
         amount = findViewById(R.id.mamount);
@@ -151,9 +153,17 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
         layout_comments=findViewById(R.id.layout_comments);
         layout_remarks=findViewById(R.id.layout_remarks);
         layout_pickloc=findViewById(R.id.layout_pickloc);
+        deliveryreciept=findViewById(R.id.deliveryreciept);
         couriernames = new ArrayList<>();
         bikernames = new ArrayList<>();
         shipmentbill=findViewById(R.id.shipmentbill);
+        shipmenttracker=findViewById(R.id.shipmenttracker);
+        shipmenttracker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                shipmentTracking();
+            }
+        });
         shipmentbill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -189,7 +199,6 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
             @Override
             public void onClick(View v) {
                 getbikerlist();
-
             }
         });
         assign_courier.setOnClickListener(new View.OnClickListener() {
@@ -203,6 +212,13 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
             @Override
             public void onClick(View v) {
                 getInvoice();
+            }
+        });
+
+        deliveryreciept.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getdeliveryReport();
             }
         });
         order_cancel.setOnClickListener(new View.OnClickListener() {
@@ -219,7 +235,6 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
                     showmaps();
                 else
                     ShowToast("Delivery Location not available.", OrderDetailActivity.this);
-
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -227,7 +242,6 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
         getSupportActionBar().setTitle(getString(R.string.Order_Details));
         upref = new UserSharedPreferences(this);
         getToken(this);
-
         orderno = getIntent().getStringExtra(constants.ORDERNO);
         user_name = getIntent().getStringExtra(constants.User_name);
         userid = getIntent().getIntExtra(constants.userid, 0);
@@ -256,7 +270,7 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
             maps.setVisibility(View.VISIBLE);
         }
         if (!order_status.equalsIgnoreCase(constants.ORDER_CREATED)&& !order_status.equalsIgnoreCase(constants.ORDER_PICKED)&& !order_status.equalsIgnoreCase(constants.POSX)&&
-                !order_status.equalsIgnoreCase(constants.ORDER_DELIVERED)&& !order_status.equalsIgnoreCase(constants.ORDER_CANCELLED))
+                !order_status.equalsIgnoreCase(constants.ORDER_POSTPONE)&&!order_status.equalsIgnoreCase(constants.ORDER_DELIVERED)&& !order_status.equalsIgnoreCase(constants.ORDER_CANCELLED))
             getButtonStatus();
         getorderdata();
         statusCheck();
@@ -463,12 +477,17 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
         }
         if(btnresult.getShowInvoice()){
             invoice.setVisibility(View.VISIBLE);
+            deliveryreciept.setVisibility(View.VISIBLE);
         }
         if(btnresult.getShowAirwayBill()){
             shipmentbill.setVisibility(View.VISIBLE);
         }
         if(btnresult.getShowAxiomBikerDelivery()){
             assign_biker.setVisibility(View.VISIBLE);
+        }
+
+        if(btnresult.getShowCourierTracker()){
+            shipmenttracker.setVisibility(View.VISIBLE);
         }
      main.setVisibility(View.VISIBLE);
     }
@@ -545,7 +564,6 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
                 } else {
                     ShowToast("Error :" + response.body().getStatus().getOutMessage(), OrderDetailActivity.this);
                 }
-
             }
 
             @Override
@@ -832,7 +850,7 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
                 if (response.body()!=null && response.body().getStatus().getOutResult()) {
                     details = response.body();
                     initview();
-                } else {
+                } else if (response.body()!=null){
                     stopLoader();
                     ShowToast("Error :" + response.body().getStatus().getOutMessage(), OrderDetailActivity.this);
                 }
@@ -915,10 +933,7 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
             assign_courier.setVisibility(View.GONE);
             reshedule.setVisibility(View.GONE);
             invoice.setVisibility(View.GONE);
-
-
         }
-
         else {
             pick.setVisibility(View.GONE);
             deliver.setVisibility(View.GONE);
@@ -930,11 +945,10 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
             reshedule.setVisibility(View.GONE);
         }
         if (order_status.equalsIgnoreCase(constants.ORDER_CREATED)|| order_status.equalsIgnoreCase(constants.ORDER_PICKED)||order_status.equalsIgnoreCase(constants.POSX)||
-                order_status.equalsIgnoreCase(constants.ORDER_DELIVERED)|| order_status.equalsIgnoreCase(constants.ORDER_CANCELLED)) {
+                order_status.equalsIgnoreCase(constants.ORDER_POSTPONE)|| order_status.equalsIgnoreCase(constants.ORDER_DELIVERED)|| order_status.equalsIgnoreCase(constants.ORDER_CANCELLED)) {
             main.setVisibility(View.VISIBLE);
             stopLoader();
         }
-
     }
 
     @Override
@@ -974,7 +988,6 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
         bike.setUserDetails(new UserDetails(upref.getUserId(), upref.getFirstName()));
         req.setBikerRequest(bike);
         apicall(req, "Order cancelled.");
-
     }
 
     public void onpick() {
@@ -998,7 +1011,6 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
     }
 
     private void apicall(DeliveryRequest req, final String msg) {
-
         APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
         Call<CommonApiResponse> stringCall = apiService.deliverorder(req);
         startLoader(getString(R.string.loading), this);
@@ -1021,7 +1033,6 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
                 ShowToast(getString(R.string.api_fail), OrderDetailActivity.this);
             }
         });
-
     }
 
     @Override
@@ -1068,6 +1079,36 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
 
     }
 
+    private void getdeliveryReport() {
+        APIInterface apiService = new APIClient(this).getClientforinvoice().create(APIInterface.class);
+        InvoiceInput input= new InvoiceInput();
+        input.setOrderNo(order_seqno);
+        startLoader(getString(R.string.loading), this);
+//        input.setUser(new UserDetails(upref.getUserId(), upref.getFirstName(), upref.getKeyUserCode(), upref.getKeyEmpCode()));
+        Call<Invoice> stringCall = apiService.getDeliveryReport(input);
+        stringCall.enqueue(new Callback<Invoice>() {
+            @Override
+            public void onResponse(Call<Invoice> call, Response<Invoice> response) {
+                stopLoader();
+                if (response.body().getStatus().getOutResult()) {
+                    if(response.body().getInvoice().length()>0){
+                        convertbase64topdf(response.body().getInvoice());
+                    }
+                } else {
+                    ShowToast("Error :" + response.body().getStatus().getOutMessage(), OrderDetailActivity.this);
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<Invoice> call, Throwable t) {
+                stopLoader();
+                ShowToast(getString(R.string.api_fail), OrderDetailActivity.this);
+            }
+        });
+    }
+
+
     private void getInvoice() {
         APIInterface apiService = new APIClient(this).getClientforinvoice().create(APIInterface.class);
         InvoiceInput input= new InvoiceInput();
@@ -1095,10 +1136,11 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
                 ShowToast(getString(R.string.api_fail), OrderDetailActivity.this);
             }
         });
-
     }
 
     void convertbase64topdf(String data){
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
         final File dwldsPath = new File(Environment.getExternalStorageDirectory()+"/Axiom_bikers/" + "bill" + ".pdf");
         byte[] pdfAsBytes = Base64.decode(data,0);
         try {
@@ -1109,7 +1151,7 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
             openreport();
         }
         catch (Exception e){
-
+            ShowToast(e.toString(),OrderDetailActivity.this);
         }
     }
 
@@ -1124,7 +1166,54 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
         try {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
-            // Instruct the user to install a PDF reader here, or something
         }
+    }
+
+    void shipmentTracking(){
+        APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
+        CourierOrder input= new CourierOrder();
+        input.setAxiomOrderNo(orderno);
+        startLoader(getString(R.string.loading), this);
+        input.setUserDetails(new UserDetails(upref.getUserId(), upref.getFirstName(), upref.getKeyUserCode(), upref.getKeyEmpCode()));
+        Call<CourierDetails> stringCall = apiService.shipmentTracker(input);
+        stringCall.enqueue(new Callback<CourierDetails>() {
+            @Override
+            public void onResponse(Call<CourierDetails> call, Response<CourierDetails> response) {
+                stopLoader();
+                if (response.body()!=null &&  response.body().getStatus()!=null && response.body().getStatus().getOutResult()) {
+                    if(response.body().getCourierTracker().size()>0){
+                       ShowTracketList(response.body().getCourierTracker());
+                    }
+                    else
+                        ShowToast("Shipment tracking details not available.", OrderDetailActivity.this);
+                } else  if (response.body()!=null &&  response.body().getStatus()!=null ) {
+                    ShowToast("Error :" + response.body().getStatus().getOutMessage(), OrderDetailActivity.this);
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<CourierDetails> call, Throwable t) {
+                stopLoader();
+                ShowToast(getString(R.string.api_fail), OrderDetailActivity.this);
+            }
+        });
+    }
+
+    private void ShowTracketList(List<CourierTracker> courierTracker) {
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        View view = getLayoutInflater().inflate(R.layout.dialog_tracker, null);
+        RecyclerView lv = (RecyclerView) view.findViewById(R.id.custom_list);
+        dialog.setCancelable(true);
+        // Change MyActivity.this and myListOfItems to your own values
+        CourierTRackerAdaptor clad = new CourierTRackerAdaptor(OrderDetailActivity.this, courierTracker);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        lv.setLayoutManager(mLayoutManager);
+        lv.setItemAnimator(new DefaultItemAnimator());
+        lv.setAdapter(clad);
+        dialog.setContentView(view);
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.show();
     }
 }

@@ -126,16 +126,19 @@
             android:text="Item code"
             android:textSize="16sp" />
 
-        <EditText
+        <AutoCompleteTextView
             android:id="@+id/itemcode"
             android:layout_width="400dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:padding="5dp"
+            android:hint="enter Item desc"
+            android:textColor="@android:color/black"
             android:background="@drawable/white_rect"
-            android:padding="10dp"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            android:textSize="16sp"
-            android:textColor="@android:color/black"
+            android:ems="10"
+            android:textSize="14sp" />
             />
     </LinearLayout>
 

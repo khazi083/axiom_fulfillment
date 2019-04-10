@@ -31,7 +31,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class DispatchOrderList extends BaseActivity implements OrderActionListner {
-
     RecyclerView recyclerView;
     private DispatchOrderAdaptor mAdapter;
     private List<DispatchOrderitem> orderList = new ArrayList<>();
