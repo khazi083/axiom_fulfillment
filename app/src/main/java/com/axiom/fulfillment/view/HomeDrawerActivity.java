@@ -23,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.axiom.fulfillment.BuildConfig;
 import com.axiom.fulfillment.R;
 import com.axiom.fulfillment.adaptor.CustomExpandableListAdapter;
 import com.axiom.fulfillment.api.APIClient;
@@ -150,6 +151,7 @@ public class HomeDrawerActivity extends BaseActivity {
                     upref.clearSession();
                     finish();
                 }
+
             }
         });
 
@@ -495,6 +497,7 @@ public class HomeDrawerActivity extends BaseActivity {
         }
         List<String> temp1 = new ArrayList<>();
         expandableListDetail.put(getString(R.string.logout), temp1);
+        expandableListDetail.put("Version "+BuildConfig.VERSION_NAME,temp1 );
         expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
         expandableListAdapter = new CustomExpandableListAdapter(this, expandableListTitle, expandableListDetail);
         mDrawerList.setAdapter(expandableListAdapter);

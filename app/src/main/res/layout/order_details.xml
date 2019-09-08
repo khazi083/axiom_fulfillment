@@ -491,7 +491,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginStart="10dp"
-            android:layout_marginBottom="60dp"
+            android:layout_marginBottom="85dp"
             android:orientation="vertical"
             android:background="@drawable/profile_background">
 
@@ -586,7 +586,7 @@
 </ScrollView>
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:padding="5dp"
@@ -627,14 +627,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/axiom"
-            android:layout_centerInParent="true"
             android:text="Postpone Order"
             android:drawableStart="@drawable/post"
+            android:layout_below="@+id/deliver"
+            android:layout_marginTop="10dp"
             android:paddingStart="5dp"
             android:paddingEnd="20dp"
             android:drawablePadding="10dp"
             android:visibility="invisible"
-            android:gravity="start|center_vertical"
             />
 
         <LinearLayout

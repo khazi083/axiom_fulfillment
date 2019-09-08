@@ -40,7 +40,7 @@ public class CourierTRackerAdaptor extends RecyclerView.Adapter<CourierTRackerAd
     }
 
     @Override
-    public void onBindViewHolder(CourierTRackerAdaptor.MyViewHolder holder, final int position) {
+        public void onBindViewHolder(CourierTRackerAdaptor.MyViewHolder holder, final int position) {
         CourierTracker or = courierlist.get(position);
         holder.date.setText(or.getDate().replace("T"," "));
         holder.station.setText(or.getStationCode());

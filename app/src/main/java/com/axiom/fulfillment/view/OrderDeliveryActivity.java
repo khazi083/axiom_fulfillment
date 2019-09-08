@@ -293,13 +293,13 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
     private void apicall(DeliveryRequest req) {
         APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
         Call<CommonApiResponse> stringCall = apiService.deliverorder(req);
-        startLoader("saving delivery data", this);
+        startLoader("Saving delivery data", this);
         stringCall.enqueue(new Callback<CommonApiResponse>() {
             @Override
             public void onResponse(Call<CommonApiResponse> call, Response<CommonApiResponse> response) {
                 stopLoader();
                 if (response.body().getStatus().getOutResult()) {
-                    ShowToast("Order Saved sucessfully.", OrderDeliveryActivity.this);
+                    ShowToast("Order Saved successfully.", OrderDeliveryActivity.this);
                     Intent intent = getIntent();
                     intent.putExtra("order_status", "delivered");
                     setResult(RESULT_OK, intent);
@@ -441,6 +441,10 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
         int startindex=0;
         if(orderno.length()>10)
         startindex=orderno.length()-10;
+
+        File imagesFolder = new File(Environment.getExternalStorageDirectory(), "Axiom_bikers");
+        imagesFolder.mkdirs();
+
         File photo = new File(Environment.getExternalStorageDirectory()+"/Axiom_bikers", orderno.substring(startindex,orderno.length()) + "_" + attachment.replace("image","")+".JPEG");
         intent.putExtra(MediaStore.EXTRA_OUTPUT,
                 Uri.fromFile(photo));
@@ -481,7 +485,7 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
 
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(OrderDeliveryActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(OrderDeliveryActivity.this, "Failed!", Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -511,7 +515,7 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
                 }
             } catch (Exception e) {
                 Log.d("UPLOAD", e.getLocalizedMessage() + "");
-                Toast.makeText(OrderDeliveryActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(OrderDeliveryActivity.this, "Failed!", Toast.LENGTH_LONG).show();
             }
         }
     }
