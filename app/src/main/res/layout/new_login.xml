@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="50dp"
         android:scaleType="fitCenter"
         android:src="@drawable/axiomlogonew3">
 
@@ -43,7 +43,7 @@
                 android:gravity="center"/>
 
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -55,25 +55,45 @@
                     android:drawablePadding="5dp"
                     android:hint="User Name"
                     android:singleLine="true" />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
 
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
+
+            <RelativeLayout
+                android:id="@+id/rlSearch"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp">
+                >
 
-                <EditText
-                    android:id="@+id/password"
-                    android:layout_width="fill_parent"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:drawableLeft="@android:drawable/ic_partial_secure"
-                    android:hint="Password"
-                    android:inputType="textPassword"
-                    android:drawablePadding="5dp"
-                    android:singleLine="true" />
-            </android.support.design.widget.TextInputLayout>
+                    android:layout_marginBottom="10dp">
+
+                    <EditText
+                        android:id="@+id/password"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:drawableLeft="@android:drawable/ic_partial_secure"
+                        android:drawableRight="@android:drawable/ic_partial_secure"
+                        android:hint="Password"
+                        android:inputType="textPassword"
+                        android:drawablePadding="5dp"
+                        android:singleLine="true" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <ImageView
+                    android:id="@+id/toggle"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/security" />
+            </RelativeLayout>
+
+
+
 
 
             <Button
@@ -81,6 +101,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingStart="5dp"
+                android:layout_marginTop="20dp"
                 android:paddingEnd="50dp"
                 android:background="#d67601"
                 android:text="Sign in"

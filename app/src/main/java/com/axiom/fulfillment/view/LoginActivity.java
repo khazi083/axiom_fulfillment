@@ -1,11 +1,15 @@
 package com.axiom.fulfillment.view;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBar;
+import android.os.Handler;
+import androidx.appcompat.app.ActionBar;
 import android.os.Bundle;
+import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.axiom.fulfillment.R;
@@ -14,6 +18,14 @@ import com.axiom.fulfillment.api.APIInterface;
 import com.axiom.fulfillment.helper.UserSharedPreferences;
 import com.axiom.fulfillment.model.UserLogin;
 import com.axiom.fulfillment.model.UserLoginResponse;
+import com.axiom.fulfillment.model.deviceDetails;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+import androidx.annotation.NonNull;
+
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -24,6 +36,8 @@ public class LoginActivity extends BaseActivity {
     EditText username, password;
     Button login, new_reg;
     UserSharedPreferences userpref;
+    ImageView toggle;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +48,11 @@ public class LoginActivity extends BaseActivity {
         password = findViewById(R.id.password);
         login = findViewById(R.id.btnLogin);
         new_reg = findViewById(R.id.new_reg);
+        toggle=findViewById(R.id.toggle);
         userpref = new UserSharedPreferences(this);
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         if (userpref.getUserId() != 0) {
             Intent home = new Intent(LoginActivity.this, HomeDrawerActivity.class);
             startActivity(home);
@@ -55,6 +71,41 @@ public class LoginActivity extends BaseActivity {
                 startActivity(newreg);
             }
         });
+
+
+        toggle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+
+                    }
+                }, 3000);
+            }
+        });
+
+        if (userpref.getfcmkey().isEmpty()) {
+
+            FirebaseInstanceId.getInstance().getInstanceId()
+                    .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                            if (!task.isSuccessful()) {
+                                return;
+                            }
+                            // Get new Instance ID token
+                            userpref.setfcmkey( task.getResult().getToken());
+
+                        }
+                    });
+
+        }
+        Log.v("axiombiker fcm token",userpref.getfcmkey());
+
     }
 
     private void verifylogin() {
@@ -65,27 +116,45 @@ public class LoginActivity extends BaseActivity {
             Toast.makeText(this, R.string.empty_password, Toast.LENGTH_LONG).show();
             return;
         }
+        if(!internetavailable(this)) {
+            ShowToast(getString(R.string.nointernet), LoginActivity.this);
+            return;
+        }
 
         APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
         UserLogin user = new UserLogin(username.getText().toString(), password.getText().toString());
+        deviceDetails devinfo= new deviceDetails();
+        devinfo.setDeviceId(userpref.getfcmkey());
+        if(!userpref.getfcmkey().isEmpty())
+            user.setDeviceinfo(devinfo);
         Call<UserLoginResponse> stringCall = apiService.loginapi(user);
         startLoader(getString(R.string.verify_login), this);
         stringCall.enqueue(new Callback<UserLoginResponse>() {
             @Override
             public void onResponse(Call<UserLoginResponse> call, Response<UserLoginResponse> response) {
-                stopLoader();
-                if (response.body().getIsValiduser() && response.body().getUserDetails().size() > 0) {
-                    UserLoginResponse responseString = response.body();
-                    userpref.setRoleId(responseString.getEscalationId());
-                    userpref.setUserId(responseString.getUserDetails().get(0).getAudsUserId());
-                    userpref.setKeyUserCode(responseString.getUserDetails().get(0).getAudsUserCode());
-                    userpref.setFirstName(responseString.getUserDetails().get(0).getAudsUserName());
-                    userpref.setKeyEmpCode(responseString.getUserDetails().get(0).getAemsEmployeeCode());
-                    userpref.setKeyUserRole(responseString.getEscalation());
-                    Intent home = new Intent(LoginActivity.this, HomeDrawerActivity.class);
-                    startActivity(home);
-                } else
-                    ShowToast(getString(R.string.invalid_login), LoginActivity.this);
+               try {
+                   stopLoader();
+                   if (!response.body().getIsValiduser()) {
+                       ShowToast(getString(R.string.adlocked), LoginActivity.this);
+                       return;
+                   }
+
+                   else if (response.body().getIsValiduser() && response.body().getUserDetails().size() > 0) {
+                       UserLoginResponse responseString = response.body();
+                       userpref.setRoleId(responseString.getEscalationId());
+                       userpref.setUserId(responseString.getUserDetails().get(0).getAudsUserId());
+                       userpref.setKeyUserCode(responseString.getUserDetails().get(0).getAudsUserCode());
+                       userpref.setFirstName(responseString.getUserDetails().get(0).getAudsUserName());
+                       userpref.setKeyEmpCode(responseString.getUserDetails().get(0).getAemsEmployeeCode());
+                       userpref.setKeyUserRole(responseString.getEscalation());
+                       Intent home = new Intent(LoginActivity.this, HomeDrawerActivity.class);
+                       startActivity(home);
+                   } else
+                       ShowToast(getString(R.string.invalid_login), LoginActivity.this);
+               }
+               catch (Exception e){
+
+                }
 
             }
 

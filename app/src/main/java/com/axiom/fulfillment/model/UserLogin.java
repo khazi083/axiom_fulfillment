@@ -13,11 +13,25 @@ public class UserLogin {
     @Expose
     private String password;
 
+
+    @SerializedName("deviceDetails")
+    @Expose
+    private deviceDetails Deviceinfo;
+
+
     public UserLogin(){
     }
     public UserLogin(String name, String Pass){
         this.userName=name;
         this.password=Pass;
+    }
+
+    public deviceDetails getDeviceinfo() {
+        return Deviceinfo;
+    }
+
+    public void setDeviceinfo(deviceDetails deviceinfo) {
+        Deviceinfo = deviceinfo;
     }
 
     public String getUserName() {

@@ -1,10 +1,11 @@
 package com.axiom.fulfillment.adaptor;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.axiom.fulfillment.R;
 import com.axiom.fulfillment.model.OrderItemDetails;
@@ -18,6 +19,7 @@ public class OrderDetailsAdaptor extends RecyclerView.Adapter<OrderDetailsAdapto
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView pdname,pdnamedesc,pdqty,pdunitprice,tax,total;
+        LinearLayout layout_top;
 
         public MyViewHolder(View view) {
             super(view);
@@ -27,6 +29,7 @@ public class OrderDetailsAdaptor extends RecyclerView.Adapter<OrderDetailsAdapto
             pdunitprice=view.findViewById(R.id.pdprice);
             tax=view.findViewById(R.id.pdtax);
             total=view.findViewById(R.id.pdtotal);
+            layout_top=view.findViewById(R.id.layout_top);
         }
     }
 
@@ -48,7 +51,7 @@ public class OrderDetailsAdaptor extends RecyclerView.Adapter<OrderDetailsAdapto
         OrderItemDetails or = deliveryorderList.get(position);
         holder.pdname.setText(or.getItemDescription());
         holder.pdnamedesc.setText(or.getItemCode());
-        holder.pdqty.setText(String.valueOf(or.getQuantity()));
+        holder.pdqty.setText(String.valueOf(or.getQuantity().intValue()));
         holder.pdunitprice.setText(String.valueOf(or.getItemAmount()));
         holder.tax.setText(String.valueOf(or.getTaxAmount()));
         holder.total.setText(String.valueOf(or.getItemAmountTax()));

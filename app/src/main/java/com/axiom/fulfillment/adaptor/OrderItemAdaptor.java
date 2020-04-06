@@ -1,7 +1,7 @@
 package com.axiom.fulfillment.adaptor;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +13,7 @@ import com.axiom.fulfillment.R;
 import com.axiom.fulfillment.helper.OrderActionListner;
 import com.axiom.fulfillment.model.deliveryorder;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class OrderItemAdaptor extends RecyclerView.Adapter<OrderItemAdaptor.MyViewHolder> {
@@ -20,10 +21,12 @@ public class OrderItemAdaptor extends RecyclerView.Adapter<OrderItemAdaptor.MyVi
     private List<deliveryorder> deliveryorderList;
     OrderActionListner listner;
     Context ctx;
+    Boolean istab;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView orderno, cust_name,purchaseno,orderdate,assignon,msource;
         RelativeLayout mainlayout;
+
         ImageView deliveryicon;
 
         public MyViewHolder(View view) {
@@ -39,9 +42,10 @@ public class OrderItemAdaptor extends RecyclerView.Adapter<OrderItemAdaptor.MyVi
         }
     }
 
-    public OrderItemAdaptor(Context ctx,List<deliveryorder> deliveryorderList,OrderActionListner deliverylistner) {
+    public OrderItemAdaptor(Context ctx,List<deliveryorder> deliveryorderList,OrderActionListner deliverylistner, Boolean istablet) {
         this.deliveryorderList = deliveryorderList;
         listner=deliverylistner;
+        this.istab=istablet;
         this.ctx=ctx;
     }
 
@@ -54,30 +58,40 @@ public class OrderItemAdaptor extends RecyclerView.Adapter<OrderItemAdaptor.MyVi
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, final int position) {
-        deliveryorder or = deliveryorderList.get(position);
-        holder.orderno.setText(or.getObohOrderNo());
-        holder.cust_name.setText(or.getObohCustFullName());
-        holder.purchaseno.setText(or.getObohPartnerOrderNo());
-        holder.orderdate.setText(or.getObohOrderDate().replace("T"," "));
-        holder.assignon.setText(or.getOaboCreatedOn().replace("T"," "));
-        holder.msource.setText(or.getObohOrderSource());
+        try {
+            deliveryorder or = deliveryorderList.get(position);
 
-        if(or.getObohOrderSource().contains("HUAWEI"))
-            holder.deliveryicon.setImageResource(R.drawable.huaweiksa);
-        else if(or.getObohOrderSource().contains("NOON"))
-            holder.deliveryicon.setImageResource(R.drawable.noon);
-        else if(or.getObohOrderSource().contains("SWITCh"))
-            holder.deliveryicon.setImageResource(R.drawable.aeswitch1);
-        else if(or.getObohOrderSource().contains("HONOR"))
-            holder.deliveryicon.setImageResource(R.drawable.honorksa);
-        else if(or.getObohOrderSource().contains("HTCVIVE"))
-            holder.deliveryicon.setImageResource(R.drawable.htcviveuae);
-        else if(or.getObohOrderSource().contains("HTC"))
-            holder.deliveryicon.setImageResource(R.drawable.htcuae);
-        else if(or.getObohOrderSource().contains("WADI"))
-            holder.deliveryicon.setImageResource(R.drawable.wadiksa);
-        else if(or.getObohOrderSource().contains("SAMSUNG"))
-            holder.deliveryicon.setImageResource(R.drawable.samsung);
+            holder.orderno.setText(or.getObohOrderNo());
+            holder.cust_name.setText(or.getObohCustFullName());
+            holder.purchaseno.setText(or.getObohPartnerOrderNo());
+            holder.orderdate.setText(chnagedateformat(or.getObohOrderDate().replace("T", " ").substring(0,10)));
+            holder.assignon.setText(chnagedateformat(or.getOaboCreatedOn().replace("T", " ").substring(0,10)));
+            holder.msource.setText(or.getObohOrderSource());
+
+            if (istab) {
+                holder.deliveryicon.setVisibility(View.VISIBLE);
+                if (or.getObohOrderSource().contains("HUAWEI"))
+                    holder.deliveryicon.setImageResource(R.drawable.huaweiksa);
+                else if (or.getObohOrderSource().contains("NOON"))
+                    holder.deliveryicon.setImageResource(R.drawable.noon);
+                else if (or.getObohOrderSource().contains("SWITCh"))
+                    holder.deliveryicon.setImageResource(R.drawable.aeswitch1);
+                else if (or.getObohOrderSource().contains("HONOR"))
+                    holder.deliveryicon.setImageResource(R.drawable.honorksa);
+                else if (or.getObohOrderSource().contains("HTCVIVE"))
+                    holder.deliveryicon.setImageResource(R.drawable.htcviveuae);
+                else if (or.getObohOrderSource().contains("HTC"))
+                    holder.deliveryicon.setImageResource(R.drawable.htcuae);
+                else if (or.getObohOrderSource().contains("WADI"))
+                    holder.deliveryicon.setImageResource(R.drawable.wadiksa);
+                else if (or.getObohOrderSource().contains("SAMSUNG"))
+                    holder.deliveryicon.setImageResource(R.drawable.samsung);
+            } else
+                holder.deliveryicon.setVisibility(View.GONE);
+        }
+        catch (Exception e){
+            e.getMessage();
+        }
         holder.mainlayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,6 +99,20 @@ public class OrderItemAdaptor extends RecyclerView.Adapter<OrderItemAdaptor.MyVi
             }
         });
     }
+
+
+    public String chnagedateformat(String date){
+        SimpleDateFormat input = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat output = new SimpleDateFormat("dd-MM-yyyy");
+        try {
+            return output.format(input.parse(date));  // parse input
+        } catch (Exception
+                e) {
+            e.printStackTrace();
+            return date;
+        }
+    }
+
 
     @Override
     public int getItemCount() {

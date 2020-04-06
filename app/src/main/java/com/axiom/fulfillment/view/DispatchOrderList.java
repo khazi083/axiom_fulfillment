@@ -2,9 +2,9 @@ package com.axiom.fulfillment.view;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
@@ -39,6 +39,7 @@ public class DispatchOrderList extends BaseActivity implements OrderActionListne
     String key = "";
     EditText searchtext;
     TextView count;
+    Boolean istab=true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +47,8 @@ public class DispatchOrderList extends BaseActivity implements OrderActionListne
         setContentView(R.layout.activity_orderlist);
         if (getIntent().hasExtra(constants.order_type))
             key = getIntent().getStringExtra(constants.order_type);
+
+        istab=istablet();
 
         recyclerView = findViewById(R.id.recycler_view);
         upref = new UserSharedPreferences(this);
@@ -92,12 +95,12 @@ public class DispatchOrderList extends BaseActivity implements OrderActionListne
             public void afterTextChanged(Editable s) {
 
                 if (s.length() == 0) {
-                    mAdapter = new DispatchOrderAdaptor(DispatchOrderList.this, orderList, DispatchOrderList.this);
+                    mAdapter = new DispatchOrderAdaptor(DispatchOrderList.this, orderList, DispatchOrderList.this,istab);
                     recyclerView.setAdapter(mAdapter);
                     mAdapter.notifyDataSetChanged();
                 } else if (s.length() > 0) {
                     performFiltering(searchtext.getText().toString());
-                    mAdapter = new DispatchOrderAdaptor(DispatchOrderList.this, searchorderList, DispatchOrderList.this);
+                    mAdapter = new DispatchOrderAdaptor(DispatchOrderList.this, searchorderList, DispatchOrderList.this,istab);
                     recyclerView.setAdapter(mAdapter);
                     mAdapter.notifyDataSetChanged();
                 }
@@ -157,7 +160,7 @@ public class DispatchOrderList extends BaseActivity implements OrderActionListne
                         return;
                     }
                     count.setText("Total Count : "+ orderList.size());
-                    mAdapter = new DispatchOrderAdaptor(DispatchOrderList.this, orderList, DispatchOrderList.this);
+                    mAdapter = new DispatchOrderAdaptor(DispatchOrderList.this, orderList, DispatchOrderList.this,istab);
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
                     recyclerView.setLayoutManager(mLayoutManager);
                     recyclerView.setItemAnimator(new DefaultItemAnimator());

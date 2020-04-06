@@ -143,7 +143,7 @@
             android:layout_height="wrap_content"
             android:textSize="16sp"
             android:layout_gravity="bottom"
-            android:text="Please get customer sign Below :"/>
+            android:text="Customer sign Below :"/>
 
     <Button
         android:id="@+id/clear"

@@ -20,6 +20,7 @@ public class UserSharedPreferences {
     private static final String KEY_TOKEN_TIME = "tokentime";
     private static final String KEY_EMP_CODE = "hrempcode";
     private static final String KEY_USER_ROLE = "userrole";
+    private static final String KEY_FCM= "fcmkey";
 
     public String getKeyUserRole() {
         return pref.getString(KEY_USER_ROLE, "");
@@ -119,6 +120,15 @@ public class UserSharedPreferences {
         return pref.getInt(KEY_USER_ID, 0);
     }
 
+
+    public String getfcmkey() {
+        return pref.getString(KEY_FCM, "");
+    }
+
+    public void setfcmkey(String token) {
+        editor.putString(KEY_FCM, token);
+        editor.commit();
+    }
 
     public void clearSession() {
         editor.clear();

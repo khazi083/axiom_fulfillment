@@ -2,9 +2,9 @@ package com.axiom.fulfillment.view;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
@@ -40,6 +40,7 @@ public class OrderListActivity extends BaseActivity implements OrderActionListne
     UserSharedPreferences upref;
     String key = "";
     EditText searchtext;
+    Boolean istablet=true;
     private TextView count;
 
     @Override
@@ -48,7 +49,7 @@ public class OrderListActivity extends BaseActivity implements OrderActionListne
         setContentView(R.layout.activity_orderlist);
         if (getIntent().hasExtra(constants.order_type))
             key = getIntent().getStringExtra(constants.order_type);
-
+        istablet=istablet();
         recyclerView = findViewById(R.id.recycler_view);
         count=findViewById(R.id.count);
         upref = new UserSharedPreferences(this);
@@ -60,7 +61,7 @@ public class OrderListActivity extends BaseActivity implements OrderActionListne
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         if (key.equalsIgnoreCase(constants.ORDER_PICKED))
-            getSupportActionBar().setTitle(getString(R.string.dispatch_screen));
+            getSupportActionBar().setTitle(getString(R.string.Picked_screen));
         else if (key.equalsIgnoreCase(constants.ORDER_CREATED))
             getSupportActionBar().setTitle(getString(R.string.new_screen));
         else if (key.equalsIgnoreCase(constants.ORDER_DELIVERED))
@@ -85,12 +86,12 @@ public class OrderListActivity extends BaseActivity implements OrderActionListne
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length() == 0) {
-                    mAdapter = new OrderItemAdaptor(OrderListActivity.this, orderList, OrderListActivity.this);
+                    mAdapter = new OrderItemAdaptor(OrderListActivity.this, orderList, OrderListActivity.this,istablet);
                     recyclerView.setAdapter(mAdapter);
                     mAdapter.notifyDataSetChanged();
                 } else if (s.length() > 0) {
                     performFiltering(searchtext.getText().toString());
-                    mAdapter = new OrderItemAdaptor(OrderListActivity.this, searchorderList, OrderListActivity.this);
+                    mAdapter = new OrderItemAdaptor(OrderListActivity.this, searchorderList, OrderListActivity.this,istablet);
                     recyclerView.setAdapter(mAdapter);
                     mAdapter.notifyDataSetChanged();
                 }
@@ -144,7 +145,7 @@ public class OrderListActivity extends BaseActivity implements OrderActionListne
                         return;
                     }
                     count.setText("Total Count : "+ orderList.size());
-                    mAdapter = new OrderItemAdaptor(OrderListActivity.this, orderList, OrderListActivity.this);
+                    mAdapter = new OrderItemAdaptor(OrderListActivity.this, orderList, OrderListActivity.this,istablet);
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
                     recyclerView.setLayoutManager(mLayoutManager);
                     recyclerView.setItemAnimator(new DefaultItemAnimator());

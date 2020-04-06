@@ -1,7 +1,7 @@
 package com.axiom.fulfillment.view;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -47,11 +47,15 @@ public class Registration extends BaseActivity {
                 verifyentries();
             }
         });
-        getRoles();
-        getToken(this);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setTitle(getString(R.string.reg_title));
+        if(!internetavailable(this)) {
+            ShowToast(getString(R.string.nointernet), Registration.this);
+            return;
+        }
+        getRoles();
+        getToken(this);
     }
 
     private void verifyentries() {
@@ -122,6 +126,7 @@ public class Registration extends BaseActivity {
     }
 
     private void getRoles() {
+
         APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
         Call<userrolesList> stringCall = apiService.getUserRoles();
         startLoader(getString(R.string.loading), this);

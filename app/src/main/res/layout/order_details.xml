@@ -13,6 +13,7 @@
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/mainlayouttab"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="7dp"
@@ -250,6 +251,280 @@
 
 
         <LinearLayout
+            android:id="@+id/mainlayoutmob"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="7dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="7dp"
+            android:layout_margin="10dp"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:background="@drawable/profile_background">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/mname_mob"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:layout_marginBottom="10dp"
+                    android:textColor="@color/black"/>
+
+                <TextView
+                    android:id="@+id/msource_mob"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:textColor="@color/white"
+                    android:background="@drawable/btn_corner"
+                    android:padding="5dp"
+                    android:layout_centerInParent="true"
+                    android:layout_alignParentEnd="true"/>
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    >
+
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:layout_marginEnd="5dp"
+                        android:textSize="14sp"
+                        android:text="Order No"/>
+
+                    <TextView
+                        android:layout_width="10dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:text=":"
+                        android:textStyle="bold"
+                        />
+
+                    <TextView
+                        android:id="@+id/morderno_mob"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/axiom"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp">
+
+
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:layout_marginEnd="5dp"
+                        android:textSize="14sp"
+                        android:text="Purchase No"/>
+
+                    <TextView
+                        android:layout_width="10dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:text=":"
+                        android:textStyle="bold"
+                        />
+
+                    <TextView
+                        android:id="@+id/purchaseno_mob"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/axiom"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        />
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+               >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    >
+
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:layout_marginEnd="5dp"
+                        android:textSize="14sp"
+                        android:text="Order Amount"/>
+
+                    <TextView
+                        android:layout_width="10dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:text=":"
+                        android:textStyle="bold"
+                        />
+
+                    <TextView
+                        android:id="@+id/mamount_mob"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/axiom"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    >
+
+
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:layout_marginEnd="5dp"
+                        android:textSize="14sp"
+                        android:text="Amount Incl Vat"/>
+                    <TextView
+                        android:layout_width="10dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:text=":"
+                        android:textStyle="bold"
+                        />
+
+                    <TextView
+                        android:id="@+id/mamounttotal_mob"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/axiom"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        />
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    >
+
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:layout_marginEnd="5dp"
+                        android:textSize="14sp"
+                        android:text="Order On"/>
+
+                    <TextView
+                        android:layout_width="10dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:text=":"
+                        android:textStyle="bold"
+                        />
+
+                    <TextView
+                        android:id="@+id/morderdate_mob"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/axiom"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    >
+
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:layout_marginEnd="5dp"
+                        android:textSize="14sp"
+                        android:text="Contact No"/>
+
+                    <TextView
+                        android:layout_width="10dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:text=":"
+                        android:textStyle="bold"
+                        />
+
+                    <TextView
+                        android:id="@+id/mmobile_mob"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/axiom"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        />
+
+
+                </LinearLayout>
+
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
             android:id="@+id/layout_remarks"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -473,7 +748,7 @@
                 android:layout_below="@+id/paymentheader"
                 android:background="@color/gray_shade3" />
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/payment_itemList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -514,7 +789,7 @@
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:paddingTop="7dp"
-                android:weightSum="6.5">
+                android:weightSum="7">
 
 
                 <TextView
@@ -529,7 +804,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="end"
+                    android:gravity="center"
                     android:text="Qty"
                     android:textColor="@color/gray_shade5"
                     android:textSize="12sp" />
@@ -557,7 +832,7 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_weight="1.5"
                     android:gravity="end"
                     android:text="Total Amount"
                     android:textColor="@color/gray_shade5"
@@ -570,7 +845,7 @@
                 android:layout_height="1dp"
                 android:background="@color/gray_shade3" />
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/order_itemList"
                 android:layout_width="match_parent"
                 android:scrollbars="vertical"
@@ -590,17 +865,17 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:padding="5dp"
-        android:background="@color/gray_shade5"
+        android:background="@android:color/transparent"
         android:layout_gravity="end">
 
         <Button
             android:id="@+id/deliver"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Deliver Order"
+            android:text="Deliver"
             android:drawableStart="@drawable/deliveredicon"
             android:paddingStart="5dp"
-            android:paddingEnd="20dp"
+            android:paddingEnd="10dp"
             android:drawablePadding="10dp"
             android:visibility="invisible"
             android:gravity="start|center_vertical"
@@ -627,15 +902,29 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/axiom"
-            android:text="Postpone Order"
+            android:text="Postpone"
             android:drawableStart="@drawable/post"
-            android:layout_below="@+id/deliver"
-            android:layout_marginTop="10dp"
+            android:layout_centerHorizontal="true"
             android:paddingStart="5dp"
-            android:paddingEnd="20dp"
+            android:paddingEnd="10dp"
             android:drawablePadding="10dp"
             android:visibility="invisible"
+            android:gravity="start|center_vertical"
             />
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            android:drawableStart="@drawable/cancelicon"
+            android:paddingStart="5dp"
+            android:paddingEnd="10dp"
+            android:drawablePadding="10dp"
+            android:visibility="invisible"
+            android:gravity="start|center_vertical"
+            android:background="@android:color/holo_red_light"
+            android:layout_alignParentEnd="true"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -771,19 +1060,7 @@
 
         </LinearLayout>
 
-        <Button
-            android:id="@+id/cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Cancel Order"
-            android:drawableStart="@drawable/cancelicon"
-            android:paddingStart="5dp"
-            android:paddingEnd="20dp"
-            android:drawablePadding="10dp"
-            android:visibility="invisible"
-            android:gravity="start|center_vertical"
-            android:background="@android:color/holo_red_light"
-            android:layout_alignParentEnd="true"/>
+
 
     </RelativeLayout>
 

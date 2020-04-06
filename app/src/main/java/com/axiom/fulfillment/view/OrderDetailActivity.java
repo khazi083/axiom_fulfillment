@@ -56,13 +56,13 @@ import com.google.android.gms.location.LocationServices;
 
 import android.os.Environment;
 import android.os.StrictMode;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.view.MenuItem;
@@ -102,6 +102,7 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
     String orderno, user_name, user_code, order_seqno;
     UserSharedPreferences upref;
     TextView ordernotxt, orderdate, sorce, purchaseno, remarks, amount, totamount, comments,cust_name, cust_mob;
+    TextView ordernotxt_m, orderdate_m, sorce_m, purchaseno_m,  amount_m, totamount_m, cust_name_m, cust_mob_m;
     TextView  shipping_address;
     TextView picklocation;
     RecyclerView orderitems, paymentdetails;
@@ -120,6 +121,7 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
     private Location mLastLocation;
     private LocationRequest locationRequest;
     private LinearLayout layout_comments, layout_remarks,layout_pickloc;
+    private LinearLayout maintablayout,maintablayout_mob;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,14 +133,28 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
         orderdate = findViewById(R.id.morderdate);
         sorce = findViewById(R.id.msource);
         purchaseno = findViewById(R.id.purchaseno);
-        remarks = findViewById(R.id.mremarks);
         amount = findViewById(R.id.mamount);
         picklocation=findViewById(R.id.picklocation);
         totamount = findViewById(R.id.mamounttotal);
-        comments = findViewById(R.id.mcomments);
         cust_name = findViewById(R.id.mname);
-        maps=findViewById(R.id.maps);
         cust_mob = findViewById(R.id.mmobile);
+        maintablayout=findViewById(R.id.mainlayouttab);
+
+        ordernotxt_m = findViewById(R.id.morderno_mob);
+        orderdate_m = findViewById(R.id.morderdate_mob);
+        sorce_m = findViewById(R.id.msource_mob);
+        purchaseno_m = findViewById(R.id.purchaseno_mob);
+        amount_m = findViewById(R.id.mamount_mob);
+        totamount_m = findViewById(R.id.mamounttotal_mob);
+        cust_name_m = findViewById(R.id.mname_mob);
+        cust_mob_m = findViewById(R.id.mmobile_mob);
+        maintablayout_mob=findViewById(R.id.mainlayoutmob);
+
+
+        comments = findViewById(R.id.mcomments);
+        remarks = findViewById(R.id.mremarks);
+        maps=findViewById(R.id.maps);
+
         shipping_address = findViewById(R.id.mshipadress);
         orderitems = findViewById(R.id.order_itemList);
         paymentdetails = findViewById(R.id.payment_itemList);
@@ -231,6 +247,13 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
         maps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if(!internetavailable(OrderDetailActivity.this)) {
+                    ShowToast(getString(R.string.nointernet), OrderDetailActivity.this);
+                    return;
+                }
+
+
                 if(DeliverGps!=null &&!DeliverGps.isEmpty() && PickGps!=null && !PickGps.isEmpty() && !DeliverGps.equalsIgnoreCase("No GPS Coordinates") &&!PickGps.equalsIgnoreCase("No GPS Coordinates"))
                     showmaps();
                 else
@@ -439,6 +462,12 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
     }
 
     private void getButtonStatus() {
+
+        if(!internetavailable(OrderDetailActivity.this)) {
+            ShowToast(getString(R.string.nointernet), OrderDetailActivity.this);
+            return;
+        }
+
         APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
         ButtonStatus input = new ButtonStatus();
         if(order_seqno!=null && !order_seqno.isEmpty())
@@ -510,6 +539,10 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
     }
 
     private void getbikerlist() {
+        if(!internetavailable(OrderDetailActivity.this)) {
+            ShowToast(getString(R.string.nointernet), OrderDetailActivity.this);
+            return;
+        }
         APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
         CourierListInput ci = new CourierListInput();
         UserDetails usr = new UserDetails(upref.getUserId(), upref.getFirstName(), upref.getKeyUserCode(), upref.getKeyEmpCode());
@@ -543,6 +576,10 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
     }
 
     private void getCourierList() {
+        if(!internetavailable(OrderDetailActivity.this)) {
+            ShowToast(getString(R.string.nointernet), OrderDetailActivity.this);
+            return;
+        }
         APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
         CourierListInput ci = new CourierListInput();
         UserDetails usr = new UserDetails(upref.getUserId(), upref.getFirstName(), upref.getKeyUserCode(), upref.getKeyEmpCode());
@@ -576,6 +613,7 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
     }
 
     private void dispatchdailog(final String dispatchtype) {
+
         final Dialog dialogView = new Dialog(OrderDetailActivity.this);
         dialogView.setCancelable(true);
         dialogView.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -626,6 +664,10 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
     }
 
     private void dispatchcourier(int pos) {
+        if(!internetavailable(OrderDetailActivity.this)) {
+            ShowToast(getString(R.string.nointernet), OrderDetailActivity.this);
+            return;
+        }
 
         APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
         createcourierorder courier = new createcourierorder();
@@ -666,6 +708,10 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
     }
 
     private void dispatchbiker(Integer pos) {
+        if(!internetavailable(OrderDetailActivity.this)) {
+            ShowToast(getString(R.string.nointernet), OrderDetailActivity.this);
+            return;
+        }
 
         APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
         bikerdispatch bk = new bikerdispatch();
@@ -757,6 +803,10 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
     }
 
     private void cancel_posxorder() {
+        if(!internetavailable(this)) {
+            ShowToast(getString(R.string.nointernet), OrderDetailActivity.this);
+            return;
+        }
         APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
         CancelPosxOrder co= new CancelPosxOrder();
         co.setUserDetails(new UserDetails(upref.getUserId(), upref.getFirstName()));
@@ -868,10 +918,33 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
 
     private void initview() {
         OrderDetail mOrderDetails = details.getOrderDetail().get(0);
-        ordernotxt.setText(mOrderDetails.getOrderNumber());
-        orderdate.setText(mOrderDetails.getOrderDate().replace("T"," "));
-        sorce.setText(mOrderDetails.getOrderSource());
-        purchaseno.setText(mOrderDetails.getObohPartnerOrderNo());
+
+        if(istablet()) {
+            maintablayout.setVisibility(View.VISIBLE);
+            maintablayout_mob.setVisibility(View.GONE);
+            ordernotxt.setText(mOrderDetails.getOrderNumber());
+            orderdate.setText(chnagedateformat(mOrderDetails.getOrderDate().replace("T", " ").substring(0,10)));
+            sorce.setText(mOrderDetails.getOrderSource());
+            purchaseno.setText(mOrderDetails.getObohPartnerOrderNo());
+            cust_name.setText(mOrderDetails.getCustomerFullName());
+            cust_mob.setText(mOrderDetails.getCustomerMobile());
+            amount.setText(String.valueOf(mOrderDetails.getOrderAmount()) + " " + mOrderDetails.getCurrencyCode());
+            totamount.setText(String.valueOf(mOrderDetails.getTotalAmount()) + " " + mOrderDetails.getCurrencyCode());
+        }
+        else{
+            maintablayout.setVisibility(View.GONE);
+            maintablayout_mob.setVisibility(View.VISIBLE);
+            ordernotxt_m.setText(mOrderDetails.getOrderNumber());
+            orderdate_m.setText(chnagedateformat(mOrderDetails.getOrderDate().replace("T", " ").substring(0,10)));
+            sorce_m.setText(mOrderDetails.getOrderSource());
+            purchaseno_m.setText(mOrderDetails.getObohPartnerOrderNo());
+            cust_name_m.setText(mOrderDetails.getCustomerFullName());
+            cust_mob_m.setText(mOrderDetails.getCustomerMobile());
+            amount_m.setText(String.valueOf(mOrderDetails.getOrderAmount()) + " " + mOrderDetails.getCurrencyCode());
+            totamount_m.setText(String.valueOf(mOrderDetails.getTotalAmount()) + " " + mOrderDetails.getCurrencyCode());
+        }
+
+
         if(mOrderDetails.getRemarks()!=null && !mOrderDetails.getRemarks().isEmpty()) {
             remarks.setText(mOrderDetails.getRemarks());
             layout_remarks.setVisibility(View.VISIBLE);
@@ -880,11 +953,8 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
             comments.setText(mOrderDetails.getComments());
             layout_comments.setVisibility(View.VISIBLE);
         }
-        amount.setText(String.valueOf(mOrderDetails.getOrderAmount()) + " " + mOrderDetails.getCurrencyCode());
-        totamount.setText(String.valueOf(mOrderDetails.getTotalAmount()) + " " + mOrderDetails.getCurrencyCode());
 
-        cust_name.setText(mOrderDetails.getCustomerFullName());
-        cust_mob.setText(mOrderDetails.getCustomerMobile());
+
         shipping_address.setText(mOrderDetails.getShippingAddress1() + " " + mOrderDetails.getShippingRegion()
                 + " " + mOrderDetails.getShippingCity() + " " + mOrderDetails.getShippingCountry());
         orderDetailsAdaptor = new OrderDetailsAdaptor(OrderDetailActivity.this, mOrderDetails.getOrderDetails());
@@ -1011,6 +1081,10 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
     }
 
     private void apicall(DeliveryRequest req, final String msg) {
+        if(!internetavailable(OrderDetailActivity.this)) {
+            ShowToast(getString(R.string.nointernet), OrderDetailActivity.this);
+            return;
+        }
         APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
         Call<CommonApiResponse> stringCall = apiService.deliverorder(req);
         startLoader(getString(R.string.loading), this);
@@ -1051,6 +1125,10 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
     }
 
     private void getShipmentReport() {
+        if(!internetavailable(OrderDetailActivity.this)) {
+            ShowToast(getString(R.string.nointernet), OrderDetailActivity.this);
+            return;
+        }
         APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
         ShipmentReportinput input= new ShipmentReportinput();
         input.setAxiomOrderNo(orderno);
@@ -1080,6 +1158,10 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
     }
 
     private void getdeliveryReport() {
+        if(!internetavailable(OrderDetailActivity.this)) {
+            ShowToast(getString(R.string.nointernet), OrderDetailActivity.this);
+            return;
+        }
         APIInterface apiService = new APIClient(this).getClientforinvoice().create(APIInterface.class);
         InvoiceInput input= new InvoiceInput();
         input.setOrderNo(order_seqno);
@@ -1110,6 +1192,10 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
 
 
     private void getInvoice() {
+        if(!internetavailable(this)) {
+            ShowToast(getString(R.string.nointernet), OrderDetailActivity.this);
+            return;
+        }
         APIInterface apiService = new APIClient(this).getClientforinvoice().create(APIInterface.class);
         InvoiceInput input= new InvoiceInput();
         input.setOrderNo(order_seqno);
@@ -1170,6 +1256,10 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
     }
 
     void shipmentTracking(){
+        if(!internetavailable(OrderDetailActivity.this)) {
+            ShowToast(getString(R.string.nointernet), OrderDetailActivity.this);
+            return;
+        }
         APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
         CourierOrder input= new CourierOrder();
         input.setAxiomOrderNo(orderno);

@@ -6,8 +6,8 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -364,6 +364,11 @@ public class HomeDrawerActivity extends BaseActivity {
     }
 
     private void getDashBoarddata() {
+
+        if(!internetavailable(HomeDrawerActivity.this)) {
+            ShowToast(getString(R.string.nointernet), HomeDrawerActivity.this);
+            return;
+        }
         APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
         UserDetails user = new UserDetails(upref.getUserId(), upref.getFirstName(), upref.getKeyUserCode(), upref.getKeyEmpCode());
         Call<DashboardResponse> stringCall = apiService.getDashboardData(user);
@@ -373,7 +378,7 @@ public class HomeDrawerActivity extends BaseActivity {
             public void onResponse(Call<DashboardResponse> call, Response<DashboardResponse> response) {
 
                 stopLoader();
-                if (response.body() != null && response.body().getDashboard() != null && response.body().getDashboard().size() > 0) {
+                if (response.body() != null && response.body().getDashboard() != null && response.body().getDashboard().size() >= 0) {
                     DashboardResponse responseString = response.body();
                     dashboarddata = responseString.getDashboard();
                     generateData();
@@ -418,7 +423,6 @@ public class HomeDrawerActivity extends BaseActivity {
                 if (response.isSuccessful()) {
                     List<menu> menu = response.body().getMenu();
                     ExpandableListDataPump(menu);
-
                 }
 
             }
@@ -483,6 +487,9 @@ public class HomeDrawerActivity extends BaseActivity {
         piedata.setSlicesSpacing(4);
         pie.setPieChartData(piedata);
         mDrawerLayout.setVisibility(View.VISIBLE);
+
+        if(!istablet())
+            mainlayout.setVisibility(View.GONE);
 
     }
 
@@ -648,8 +655,13 @@ public class HomeDrawerActivity extends BaseActivity {
         TextView source = to_add.findViewById(R.id.source);
         TextView modified = to_add.findViewById(R.id.modified);
         cust_name.setText(PendingOrderList.get(i).getObohCustFullName());
+        if(!istablet())
+            source.setVisibility(View.INVISIBLE);
+        else
+            source.setVisibility(View.VISIBLE);
+
         source.setText(PendingOrderList.get(i).getObohOrderSource());
-        modified.setText(PendingOrderList.get(i).getObohOrderDate().substring(0, 10));
+        modified.setText(chnagedateformat(PendingOrderList.get(i).getObohOrderDate().substring(0, 10)));
         to_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -687,8 +699,14 @@ public class HomeDrawerActivity extends BaseActivity {
         TextView source = to_add.findViewById(R.id.source);
         TextView modified = to_add.findViewById(R.id.modified);
         cust_name.setText(PickedOrderList.get(i).getObohCustFullName());
+
+        if(!istablet())
+            source.setVisibility(View.INVISIBLE);
+        else
+            source.setVisibility(View.VISIBLE);
+
         source.setText(PickedOrderList.get(i).getObohOrderSource());
-        modified.setText(PickedOrderList.get(i).getObohOrderDate().substring(0, 10));
+        modified.setText(chnagedateformat(PickedOrderList.get(i).getObohOrderDate().substring(0, 10)));
         to_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

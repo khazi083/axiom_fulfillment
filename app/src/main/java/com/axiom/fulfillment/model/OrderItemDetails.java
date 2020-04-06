@@ -82,6 +82,18 @@ public class OrderItemDetails {
     private String obodPickedStatus;
 
 
+    @SerializedName("ItmrItemStockable")
+    @Expose
+    private String ItmrItemStockable;
+
+    public String getItmrItemStockable() {
+        return ItmrItemStockable;
+    }
+
+    public void setItmrItemStockable(String itmrItemStockable) {
+        ItmrItemStockable = itmrItemStockable;
+    }
+
     public Double getLineSequence() {
         return lineSequence;
     }

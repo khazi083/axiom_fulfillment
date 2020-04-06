@@ -2,9 +2,9 @@ package com.axiom.fulfillment.view;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
@@ -40,6 +40,7 @@ public class PosxOrderList extends BaseActivity implements OrderActionListner {
     String key = constants.POSX;
     EditText searchtext;
     TextView count;
+    Boolean istab=true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +51,7 @@ public class PosxOrderList extends BaseActivity implements OrderActionListner {
         searchtext = findViewById(R.id.search_order);
         count=findViewById(R.id.count);
 
+        istab=istablet();
         getToken(this);
         getorderdata();
 
@@ -72,12 +74,12 @@ public class PosxOrderList extends BaseActivity implements OrderActionListner {
             public void afterTextChanged(Editable s) {
 
                 if (s.length() == 0) {
-                    mAdapter = new DispatchOrderAdaptor(PosxOrderList.this, orderList, PosxOrderList.this);
+                    mAdapter = new DispatchOrderAdaptor(PosxOrderList.this, orderList, PosxOrderList.this,istab);
                     recyclerView.setAdapter(mAdapter);
                     mAdapter.notifyDataSetChanged();
                 } else if (s.length() > 0) {
                     performFiltering(searchtext.getText().toString());
-                    mAdapter = new DispatchOrderAdaptor(PosxOrderList.this, searchorderList, PosxOrderList.this);
+                    mAdapter = new DispatchOrderAdaptor(PosxOrderList.this, searchorderList, PosxOrderList.this,istab);
                     recyclerView.setAdapter(mAdapter);
                     mAdapter.notifyDataSetChanged();
                 }
@@ -134,7 +136,7 @@ public class PosxOrderList extends BaseActivity implements OrderActionListner {
                         return;
                     }
                     count.setText("Total Count : "+ orderList.size());
-                    mAdapter = new DispatchOrderAdaptor(PosxOrderList.this, orderList, PosxOrderList.this);
+                    mAdapter = new DispatchOrderAdaptor(PosxOrderList.this, orderList, PosxOrderList.this,istab);
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
                     recyclerView.setLayoutManager(mLayoutManager);
                     recyclerView.setItemAnimator(new DefaultItemAnimator());

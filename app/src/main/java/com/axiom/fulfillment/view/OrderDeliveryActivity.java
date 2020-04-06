@@ -1,25 +1,28 @@
 package com.axiom.fulfillment.view;
 
 import android.Manifest;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.StrictMode;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
+import androidx.appcompat.app.AlertDialog;
 import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
@@ -49,7 +52,7 @@ import com.google.android.gms.location.LocationServices;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,6 +81,8 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
     private Location mLastLocation;
     private LocationRequest locationRequest;
     ScrollView scrollview;
+
+    public String mCurrentPhotoPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -291,6 +296,12 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
     }
 
     private void apicall(DeliveryRequest req) {
+
+        if(!internetavailable(OrderDeliveryActivity.this)) {
+            ShowToast(getString(R.string.nointernet), OrderDeliveryActivity.this);
+            return;
+        }
+
         APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
         Call<CommonApiResponse> stringCall = apiService.deliverorder(req);
         startLoader("Saving delivery data", this);
@@ -306,7 +317,6 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
                     finish();
                 } else {
                     ShowToast("Error :" + response.body().getStatus().getOutMessage(), OrderDeliveryActivity.this);
-                    finish();
                 }
 
             }
@@ -329,7 +339,26 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     callPermission();
                 }
-            } else
+            }
+            else if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    callPermission();
+                }
+            }
+
+            else if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    callPermission();
+                }
+            }
+
+            else if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    callPermission();
+                }
+            }
+
+            else
                 showPictureDialog(img);
         }
     }
@@ -338,30 +367,30 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     private void callPermission() {
 
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-            //If the user has denied the permission previously your code will come to this block
-            //Here you can explain why you need this permission
-            //Explain here why you need this permission
-        }
-
-
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            //If the user has denied the permission previously your code will come to this block
-            //Here you can explain why you need this permission
-            //Explain here why you need this permission
-        }
-
-
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            //If the user has denied the permission previously your code will come to this block
-            //Here you can explain why you need this permission
-            //Explain here why you need this permission
-        }
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-            //If the user has denied the permission previously your code will come to this block
-            //Here you can explain why you need this permission
-            //Explain here why you need this permission
-        }
+//        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+//            //If the user has denied the permission previously your code will come to this block
+//            //Here you can explain why you need this permission
+//            //Explain here why you need this permission
+//        }
+//
+//
+//        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+//            //If the user has denied the permission previously your code will come to this block
+//            //Here you can explain why you need this permission
+//            //Explain here why you need this permission
+//        }
+//
+//
+//        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+//            //If the user has denied the permission previously your code will come to this block
+//            //Here you can explain why you need this permission
+//            //Explain here why you need this permission
+//        }
+//        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+//            //If the user has denied the permission previously your code will come to this block
+//            //Here you can explain why you need this permission
+//            //Explain here why you need this permission
+//        }
 
         //And finally ask for the permission
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_COARSE_LOCATION}, 3);
@@ -421,7 +450,7 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
                                 choosePhotoFromGallary();
                                 break;
                             case 1:
-                                takePhotoFromCamera();
+                                openCameraIntent();
                                 break;
                         }
                     }
@@ -436,23 +465,51 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
         startActivityForResult(galleryIntent, GALLERY);
     }
 
-    private void takePhotoFromCamera() {
-        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        int startindex=0;
+    private File createImageFile() {
+         int startindex=0;
         if(orderno.length()>10)
         startindex=orderno.length()-10;
+//
+        File storageDir =
+                getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
-        File imagesFolder = new File(Environment.getExternalStorageDirectory(), "Axiom_bikers");
-        imagesFolder.mkdirs();
+        return new File(storageDir, orderno.substring(startindex,orderno.length()) + "_" + attachment.replace("image","")+".JPEG");
 
-        File photo = new File(Environment.getExternalStorageDirectory()+"/Axiom_bikers", orderno.substring(startindex,orderno.length()) + "_" + attachment.replace("image","")+".JPEG");
-        intent.putExtra(MediaStore.EXTRA_OUTPUT,
-                Uri.fromFile(photo));
-        imageUri = Uri.fromFile(photo);
-        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-        StrictMode.setVmPolicy(builder.build());
-        startActivityForResult(intent, CAMERA);
+//        intent.putExtra(MediaStore.EXTRA_OUTPUT,
+//                Uri.fromFile(photo));
+//        imageUri = Uri.fromFile(photo);
+//        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+//        StrictMode.setVmPolicy(builder.build());
+//        startActivityForResult(intent, CAMERA);
     }
+
+
+    private void openCameraIntent() {
+        Intent pictureIntent = new Intent(
+                MediaStore.ACTION_IMAGE_CAPTURE);
+        if(pictureIntent.resolveActivity(getPackageManager()) != null){
+            File photoFile=null;
+            try {
+                photoFile = createImageFile();
+                mCurrentPhotoPath=photoFile.getAbsolutePath();
+            } catch (Exception ex) {
+                ex.getLocalizedMessage();
+
+            }
+            if (photoFile != null) {
+
+                if (photoFile != null) {
+                    imageUri = FileProvider.getUriForFile(this, "com.axiom.fulfillment.provider", photoFile);
+                    pictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                            imageUri);
+                    startActivityForResult(pictureIntent,
+                            CAMERA);
+                }
+
+            }
+        }
+    }
+
 
 
     @Override
@@ -464,26 +521,34 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
         }
         else if (requestCode == GALLERY) {
             if (data != null) {
-                Uri contentURI = data.getData();
 
                 try {
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
-                    switch (attachment) {
-                        case "image1":
-                            imageview_one.setImageBitmap(bitmap);
-                            base64img1 = convertbase64(bitmap);
-                            break;
-                        case "image2":
-                            imageview_two.setImageBitmap(bitmap);
-                            base64img2 = convertbase64(bitmap);
-                            break;
-                        case "image3":
-                            imageview_three.setImageBitmap(bitmap);
-                            base64img3 = convertbase64(bitmap);
-                            break;
+                    Uri uri = data.getData();
+                    String[] projection = {MediaStore.Images.Media.DATA};
+                    Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+                    if(cursor != null) {
+                        cursor.moveToFirst();
+                        int columnIndex = cursor.getColumnIndex(projection[0]);
+                        Bitmap bitmap = resizeGalleryImageNSave(cursor.getString(columnIndex));
+                        cursor.close();
+
+                        switch (attachment) {
+                            case "image1":
+                                imageview_one.setImageBitmap(bitmap);
+                                base64img1 = convertbase64(bitmap);
+                                break;
+                            case "image2":
+                                imageview_two.setImageBitmap(bitmap);
+                                base64img2 = convertbase64(bitmap);
+                                break;
+                            case "image3":
+                                imageview_three.setImageBitmap(bitmap);
+                                base64img3 = convertbase64(bitmap);
+                                break;
+                        }
                     }
 
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     Toast.makeText(OrderDeliveryActivity.this, "Failed!", Toast.LENGTH_LONG).show();
                 }
@@ -491,12 +556,7 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
 
         } else if (requestCode == CAMERA) {
             try {
-//                Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-                Uri selectedImage = imageUri;
-                ContentResolver cr = getContentResolver();
-                Bitmap thumbnail;
-                thumbnail = android.provider.MediaStore.Images.Media
-                        .getBitmap(cr, selectedImage);
+                Bitmap thumbnail = resizeNSave();
 
                 switch (attachment) {
                     case "image1":
@@ -522,8 +582,94 @@ public class OrderDeliveryActivity extends BaseActivity implements View.OnClickL
 
     public static String convertbase64(Bitmap bitmap) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
         return Base64.encodeToString(outputStream.toByteArray(), Base64.DEFAULT);
+    }
+
+    private Bitmap resizeNSave() {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 4;
+        Matrix matrix = new Matrix();
+        try {
+            ExifInterface ei = new ExifInterface(mCurrentPhotoPath);
+            int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_UNDEFINED);
+            if (orientation == ExifInterface.ORIENTATION_ROTATE_90)
+                matrix.postRotate(90);
+            else if (orientation == ExifInterface.ORIENTATION_ROTATE_180)
+                matrix.postRotate(180);
+            else if (orientation == ExifInterface.ORIENTATION_ROTATE_270)
+                matrix.postRotate(270);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath,
+                options);
+        if(bitmap!=null) {
+            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            File file;
+            file = new File(mCurrentPhotoPath);
+            try {
+                FileOutputStream out = new FileOutputStream(file);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
+                out.flush();
+                out.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return bitmap;
+    }
+
+
+
+
+    public Bitmap resizeGalleryImageNSave( String path) {
+        File photoFile;
+        try {
+            photoFile = createImageFile();
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 3;
+            Matrix matrix = new Matrix();
+
+            try {
+                ExifInterface ei = new ExifInterface(path);
+                int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                        ExifInterface.ORIENTATION_UNDEFINED);
+                if (orientation == ExifInterface.ORIENTATION_ROTATE_90)
+                    matrix.postRotate(90);
+                else if (orientation == ExifInterface.ORIENTATION_ROTATE_180)
+                    matrix.postRotate(180);
+                else if (orientation == ExifInterface.ORIENTATION_ROTATE_270)
+                    matrix.postRotate(270);
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+
+
+            Bitmap bitmap = BitmapFactory.decodeFile(path, options);
+            if (bitmap != null) {
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                File file;
+                file = new File(photoFile.getAbsolutePath());
+                try {
+                    FileOutputStream out = new FileOutputStream(file);
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 80, out);
+                    out.flush();
+                    out.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            return bitmap;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+
     }
 
     protected synchronized void buildGoogleApiClient() {

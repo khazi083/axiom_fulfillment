@@ -434,7 +434,7 @@
             android:layout_below="@+id/paymentheader"
             android:background="@color/gray_shade3" />
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/payment_itemList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -531,7 +531,7 @@
                 android:layout_height="1dp"
                 android:background="@color/gray_shade3" />
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/order_itemList"
                 android:layout_width="match_parent"
                 android:scrollbars="vertical"

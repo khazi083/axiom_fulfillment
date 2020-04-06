@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Axiom Fulfillment</string>
+    <string name="app_name">Axiom Biker</string>
     //screen names
     <string name="dispatch_screen">Ready to Dispatch</string>
     <string name="AWB_screen">AWB Created</string>
@@ -18,6 +18,8 @@
     <string name="Order_Delivery">Order Delivery</string>
     <string name="stock_check">ERP Stock Check</string>
     <string name="price_check">Price Check</string>
+
+    <string name="nointernet">Internet connection not available</string>
 
 
     // Login Screen
@@ -60,4 +62,6 @@
     //order detailed screen
     <string name="loading_bikers">Loading Axiom Biker</string>
     <string name="loading_courier">Loading Courier Details</string>
+    <string name="default_notification_channel_id">1456</string>
+    <string name="adlocked">User is not valid in AD/Locked in AD</string>
 </resources>
