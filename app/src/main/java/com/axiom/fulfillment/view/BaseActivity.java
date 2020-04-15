@@ -33,8 +33,13 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public void stopLoader() {
-        if (progress != null && progress.isShowing()) {
-            progress.dismiss();
+        try {
+            if (progress != null && progress.isShowing()) {
+                progress.dismiss();
+            }
+        }
+        catch (Exception e){
+            e.getMessage();
         }
     }
 

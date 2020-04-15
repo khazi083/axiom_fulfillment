@@ -597,7 +597,8 @@ public class HomeDrawerActivity extends BaseActivity {
             pie.setVisibility(View.GONE);
             colchart.setVisibility(View.VISIBLE);
             backgraph.setVisibility(View.VISIBLE);
-            ShowLinechartdata(dashboarddata.get(arcIndex).getLevel1());
+            if(dashboarddata.size()>=arcIndex)
+                ShowLinechartdata(dashboarddata.get(arcIndex).getLevel1());
         }
 
         @Override

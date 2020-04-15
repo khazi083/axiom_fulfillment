@@ -134,11 +134,19 @@ public class LoginActivity extends BaseActivity {
             public void onResponse(Call<UserLoginResponse> call, Response<UserLoginResponse> response) {
                try {
                    stopLoader();
-                   if (!response.body().getIsValiduser()) {
-                       ShowToast(getString(R.string.adlocked), LoginActivity.this);
+                    if (!response.body().getIsValidDomainUser()) {
+                      ShowToast(getString(R.string.adlocked), LoginActivity.this);
                        return;
                    }
 
+                   else if (!response.body().getIsValiduser()) {
+                       if(response.body().getErrorMessage()!=null && !response.body().getErrorMessage().isEmpty() &&
+                       !response.body().getErrorMessage().equalsIgnoreCase("null"))
+                           ShowToast(response.body().getErrorMessage(),LoginActivity.this);
+                       else
+                            ShowToast(getString(R.string.fullfillerror), LoginActivity.this);
+                       return;
+                   }
                    else if (response.body().getIsValiduser() && response.body().getUserDetails().size() > 0) {
                        UserLoginResponse responseString = response.body();
                        userpref.setRoleId(responseString.getEscalationId());
@@ -149,7 +157,10 @@ public class LoginActivity extends BaseActivity {
                        userpref.setKeyUserRole(responseString.getEscalation());
                        Intent home = new Intent(LoginActivity.this, HomeDrawerActivity.class);
                        startActivity(home);
-                   } else
+                   }
+                   else if(response.body().getErrorMessage()!=null && !response.body().getErrorMessage().isEmpty())
+                       ShowToast(response.body().getErrorMessage(),LoginActivity.this);
+                   else
                        ShowToast(getString(R.string.invalid_login), LoginActivity.this);
                }
                catch (Exception e){

@@ -64,4 +64,5 @@
     <string name="loading_courier">Loading Courier Details</string>
     <string name="default_notification_channel_id">1456</string>
     <string name="adlocked">User is not valid in AD/Locked in AD</string>
+    <string name="fullfillerror">Please check if user is register and have access to fulfilment, Contact support team.</string>
 </resources>
