@@ -9,6 +9,9 @@ public class UserDetails {
     @Expose
     private int AudsUserId;
 
+    @SerializedName("AomsOrganizationCode")
+    @Expose
+    private String AomsOrganizationCode;
 
     @SerializedName("AudsUserName")
     @Expose
@@ -44,6 +47,14 @@ public class UserDetails {
     }
     public int getAudsUserId() {
         return AudsUserId;
+    }
+
+    public String getAomsOrganizationCode() {
+        return AomsOrganizationCode;
+    }
+
+    public void setAomsOrganizationCode(String aomsOrganizationCode) {
+        AomsOrganizationCode = aomsOrganizationCode;
     }
 
     public String getAudsUserCode() {

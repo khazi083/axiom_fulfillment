@@ -53,7 +53,7 @@ public class LoginActivity extends BaseActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-        if (userpref.getUserId() != 0) {
+        if (userpref.getUserId() != 0 && !userpref.getKeyCountryCode().isEmpty()) {
             Intent home = new Intent(LoginActivity.this, HomeDrawerActivity.class);
             startActivity(home);
         }
@@ -155,6 +155,7 @@ public class LoginActivity extends BaseActivity {
                        userpref.setFirstName(responseString.getUserDetails().get(0).getAudsUserName());
                        userpref.setKeyEmpCode(responseString.getUserDetails().get(0).getAemsEmployeeCode());
                        userpref.setKeyUserRole(responseString.getEscalation());
+                       userpref.setKeyCountryCode(responseString.getUserDetails().get(0).getAomsOrganizationCode());
                        Intent home = new Intent(LoginActivity.this, HomeDrawerActivity.class);
                        startActivity(home);
                    }
@@ -164,7 +165,8 @@ public class LoginActivity extends BaseActivity {
                        ShowToast(getString(R.string.invalid_login), LoginActivity.this);
                }
                catch (Exception e){
-
+                   if(e.getMessage()!=null && !e.getMessage().isEmpty())
+                        ShowToast(e.getMessage(), LoginActivity.this);
                 }
 
             }

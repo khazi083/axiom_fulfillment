@@ -22,6 +22,7 @@ import com.axiom.fulfillment.model.ItemdescInput;
 import com.axiom.fulfillment.model.ItemdescList;
 import com.axiom.fulfillment.model.Locationlist;
 import com.axiom.fulfillment.model.OrderDetailsInput;
+import com.axiom.fulfillment.model.OrderStatusDetails;
 import com.axiom.fulfillment.model.Order_details;
 import com.axiom.fulfillment.model.PosXorders;
 import com.axiom.fulfillment.model.ShipmentReport;
@@ -145,4 +146,9 @@ public interface APIInterface {
 
     @POST("DeliveryReceipt")
     Call<Invoice> getDeliveryReport(@Body InvoiceInput input);
+
+
+    @POST("api/logistics/axiombikers/get")
+    Call<OrderStatusDetails> getorderstatus(@Body ButtonStatus input);
+
 }

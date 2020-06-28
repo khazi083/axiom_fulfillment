@@ -19,6 +19,7 @@ public class constants {
     public static final String CANCELLED = "CANCELLED";
     public static final String COMPLETE = "COMPLETE";
     public static final String ORDERNO = "ORDERNO";
+    public static final String MOVEORDERNO = "MOVEORDERNO";
     public static final String OABOID = "OABOID";
     public static final String OADBID = "OADBID";
     public static final String User_name = "User_name";

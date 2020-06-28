@@ -1,3 +1,4 @@
+
 <resources>
     <string name="app_name">Axiom Biker</string>
     //screen names
@@ -54,9 +55,15 @@
     <string name="choose_country">Select Country</string>
     <string name="noorders">No orders to show</string>
     <string-array name="country_array">
-        <item>Select Country</item>
-        <item>UAE</item>
-        <item>KSA</item>
+    <item>Select Country</item>
+    <item>UAE</item>
+    <item>KSA</item>
+</string-array>
+
+    <string-array name="idtype_array">
+        <item>Select Id</item>
+        <item>Passport</item>
+        <item>Saudi iqama</item>
     </string-array>
 
     //order detailed screen
@@ -65,4 +72,5 @@
     <string name="default_notification_channel_id">1456</string>
     <string name="adlocked">User is not valid in AD/Locked in AD</string>
     <string name="fullfillerror">Please check if user is register and have access to fulfilment, Contact support team.</string>
+    <string name="choose_id">Select id</string>
 </resources>

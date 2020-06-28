@@ -41,7 +41,7 @@
         <activity
             android:name="com.axiom.fulfillment.view.LoginActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:screenOrientation="portrait">
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW"/>
@@ -50,37 +50,52 @@
         </activity>
         <activity android:name="com.axiom.fulfillment.view.Registration"
             android:configChanges="orientation|keyboardHidden"
-            android:screenOrientation="portrait"/>
+            />
         <activity android:name="com.axiom.fulfillment.view.HomeDrawerActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:screenOrientation="portrait"/>
+           />
         <activity
             android:name="com.axiom.fulfillment.view.OrderListActivity"
             android:windowSoftInputMode="stateAlwaysHidden"
             android:configChanges="orientation|keyboardHidden"
-            android:screenOrientation="portrait"/>
+            />
         <activity android:name="com.axiom.fulfillment.view.OrderDeliveryActivity"
             android:configChanges="orientation|keyboardHidden"
             android:windowSoftInputMode="stateAlwaysHidden"
-            android:screenOrientation="portrait"/>
+            />
+        <activity android:name="com.axiom.fulfillment.view.OrderDeliverySaudi"
+            android:configChanges="orientation|keyboardHidden"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            />
+
+
         <activity
             android:name="com.axiom.fulfillment.view.OrderDetailActivity"
             android:windowSoftInputMode="stateAlwaysHidden"
             android:configChanges="orientation|keyboardHidden"
-            android:screenOrientation="portrait"/>
+            />
         <activity
             android:name="com.axiom.fulfillment.view.DispatchOrderList"
             android:windowSoftInputMode="stateAlwaysHidden"
             android:configChanges="orientation|keyboardHidden"
-            android:screenOrientation="portrait"/>
+            />
         <activity android:name=".view.Erp_Stock"
             android:configChanges="orientation|keyboardHidden"
             android:windowSoftInputMode="stateAlwaysHidden"
-            android:screenOrientation="portrait"/>
+            />
         <activity android:name=".view.PosxOrderList"
             android:configChanges="orientation|keyboardHidden"
             android:windowSoftInputMode="stateAlwaysHidden"
-            android:screenOrientation="portrait"/>
+            />
+        <activity android:name=".view.ScanActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            />
+
+        <activity android:name=".view.OrderDetailNew"
+            android:configChanges="orientation|keyboardHidden"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            />
 
         <service
             android:name=".helper.MyFirebaseMessagingService"

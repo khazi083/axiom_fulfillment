@@ -12,6 +12,17 @@ public class OrderDetailsInput {
     @Expose
     private String OrderNo;
 
+    @SerializedName("MoveOrderNo")
+    @Expose
+    private String MoveOrderNo;
+
+    public String getMove_orderno() {
+        return MoveOrderNo;
+    }
+
+    public void setMove_orderno(String MoveOrderNo) {
+        this.MoveOrderNo = MoveOrderNo;
+    }
 
     public UserDetails getUser() {
         return user;

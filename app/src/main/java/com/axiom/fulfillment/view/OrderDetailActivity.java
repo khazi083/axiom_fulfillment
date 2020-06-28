@@ -99,7 +99,7 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
     String order_status, ChannelCode, source,POSSTOCKLOC,POSORDERSTATUS,POSPURCHASENO, PickLocation;
     String DeliverGps,PickGps;
     int userid, OABOID, OADBID;
-    String orderno, user_name, user_code, order_seqno;
+    String orderno,move_orderno, user_name, user_code, order_seqno;
     UserSharedPreferences upref;
     TextView ordernotxt, orderdate, sorce, purchaseno, remarks, amount, totamount, comments,cust_name, cust_mob;
     TextView ordernotxt_m, orderdate_m, sorce_m, purchaseno_m,  amount_m, totamount_m, cust_name_m, cust_mob_m;
@@ -267,6 +267,7 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
         getToken(this);
         orderno = getIntent().getStringExtra(constants.ORDERNO);
         user_name = getIntent().getStringExtra(constants.User_name);
+        move_orderno=getIntent().getStringExtra(constants.MOVEORDERNO);
         userid = getIntent().getIntExtra(constants.userid, 0);
         user_code = getIntent().getStringExtra(constants.usercode);
         order_status = getIntent().getStringExtra(constants.order_type);
@@ -326,7 +327,7 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
                 .addConnectionCallbacks(this)
                 .addApi(LocationServices.API)
                 .build();
-    }
+}
 
     @Override
     public void onConnected(Bundle bundle) {
@@ -889,7 +890,10 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
     private void getorderdata() {
         APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
         OrderDetailsInput input = new OrderDetailsInput();
-        input.setOrderNo(orderno);
+        if(orderno!=null && !orderno.isEmpty())
+            input.setOrderNo(orderno);
+        else
+            input.setMove_orderno(move_orderno);
         input.setUser(new UserDetails(upref.getUserId(), upref.getFirstName(), upref.getKeyUserCode(), upref.getKeyEmpCode()));
         Call<Order_details> stringCall = apiService.orderdetails(input);
         startLoader(getString(R.string.loading), this);
@@ -971,7 +975,7 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
         paymentdetails.setAdapter(paymentDetailsAdaptor);
 
         if (order_status.equalsIgnoreCase(constants.ORDER_CREATED)) {
-            pick.setVisibility(View.VISIBLE);
+            pick.setVisibility(View.INVISIBLE);
             deliver.setVisibility(View.INVISIBLE);
             cancel.setVisibility(View.INVISIBLE);
             assign_biker.setVisibility(View.GONE);
@@ -981,9 +985,9 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
 
         } else if (order_status.equalsIgnoreCase(constants.ORDER_PICKED)) {
             pick.setVisibility(View.INVISIBLE);
-            deliver.setVisibility(View.VISIBLE);
-            cancel.setVisibility(View.VISIBLE);
-            reshedule.setVisibility(View.VISIBLE);
+            deliver.setVisibility(View.INVISIBLE);
+            cancel.setVisibility(View.INVISIBLE);
+            reshedule.setVisibility(View.INVISIBLE);
             assign_biker.setVisibility(View.GONE);
             assign_courier.setVisibility(View.GONE);
 
@@ -1034,14 +1038,28 @@ public class OrderDetailActivity extends BaseActivity implements  GoogleApiClien
     }
 
     public void ondeliver() {
-        Intent intent = new Intent(OrderDetailActivity.this, OrderDeliveryActivity.class);
-        intent.putExtra(constants.OABOID, OABOID);
-        intent.putExtra(constants.OADBID, OADBID);
-        intent.putExtra(constants.ORDERNO, details.getOrderDetail().get(0).getOrderNumber());
-        intent.putExtra("order_amount", String.valueOf(details.getOrderDetail().get(0).getTotalAmount()) + " " +
-                details.getOrderDetail().get(0).getCurrencyCode());
-        intent.putExtra("cust_name", details.getOrderDetail().get(0).getCustomerFullName());
-        startActivityForResult(intent, req_code);
+        if(upref.getKeyCountryCode().equalsIgnoreCase("219")){
+            Intent intent = new Intent(OrderDetailActivity.this, OrderDeliverySaudi.class);
+            intent.putExtra(constants.OABOID, OABOID);
+            intent.putExtra(constants.OADBID, OADBID);
+            intent.putExtra(constants.ORDERNO, details.getOrderDetail().get(0).getOrderNumber());
+            intent.putExtra("order_amount", String.valueOf(details.getOrderDetail().get(0).getTotalAmount()) + " " +
+                    details.getOrderDetail().get(0).getCurrencyCode());
+            intent.putExtra("cust_name", details.getOrderDetail().get(0).getCustomerFullName());
+            startActivityForResult(intent, req_code);
+        }
+
+
+       else {
+            Intent intent = new Intent(OrderDetailActivity.this, OrderDeliverySaudi.class);
+            intent.putExtra(constants.OABOID, OABOID);
+            intent.putExtra(constants.OADBID, OADBID);
+            intent.putExtra(constants.ORDERNO, details.getOrderDetail().get(0).getOrderNumber());
+            intent.putExtra("order_amount", String.valueOf(details.getOrderDetail().get(0).getTotalAmount()) + " " +
+                    details.getOrderDetail().get(0).getCurrencyCode());
+            intent.putExtra("cust_name", details.getOrderDetail().get(0).getCustomerFullName());
+            startActivityForResult(intent, req_code);
+        }
     }
 
     public void oncancel() {

@@ -44,6 +44,42 @@ public class BikerRequest {
     @Expose
     private String OaboUserGps ;
 
+    @SerializedName("DocumentIdType")
+    @Expose
+    private String DocumentIdType ;
+
+    @SerializedName("DocumentId")
+    @Expose
+    private String DocumentId ;
+
+    @SerializedName("DocumentHolderName")
+    @Expose
+    private String DocumentHolderName ;
+
+    public String getDocumentIdType() {
+        return DocumentIdType;
+    }
+
+    public void setDocumentIdType(String documentIdType) {
+        DocumentIdType = documentIdType;
+    }
+
+    public String getDocumentId() {
+        return DocumentId;
+    }
+
+    public void setDocumentId(String documentId) {
+        DocumentId = documentId;
+    }
+
+    public String getDocumentHolderName() {
+        return DocumentHolderName;
+    }
+
+    public void setDocumentHolderName(String documentHolderName) {
+        DocumentHolderName = documentHolderName;
+    }
+
     public String getOaboUserGps() {
         return OaboUserGps;
     }

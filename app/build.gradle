@@ -23,8 +23,8 @@ android {
         minSdkVersion 17
         targetSdkVersion 28
         multiDexEnabled true
-        versionCode 3
-        versionName "1.0.3"
+        versionCode 4
+        versionName "1.0.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.debug_build
     }
@@ -32,7 +32,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            debuggable false
+            debuggable true
             jniDebuggable false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -65,6 +65,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'me.dm7.barcodescanner:zbar:1.8.4'
 
     implementation "com.google.android.gms:play-services-analytics:$playServiceVersion"
     implementation "com.google.android.gms:play-services-location:$playServiceVersion"

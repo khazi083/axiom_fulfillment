@@ -1,11 +1,17 @@
 package com.axiom.fulfillment.view;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import android.util.DisplayMetrics;
@@ -84,6 +90,7 @@ public class HomeDrawerActivity extends BaseActivity {
     LinearLayout mainlayout, pendingorder_layout, pickedorders_layout;
     List<deliveryorder> PendingOrderList;
     List<deliveryorder> PickedOrderList;
+    Button scanorder;
     private TextView Username;
 
     @Override
@@ -101,6 +108,22 @@ public class HomeDrawerActivity extends BaseActivity {
         pickedorders_layout = findViewById(R.id.picked_layout);
         colchart = findViewById(R.id.colchart);
         backgraph = findViewById(R.id.backgraph);
+        scanorder=findViewById(R.id.scan);
+
+        scanorder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (ActivityCompat.checkSelfPermission(HomeDrawerActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ) {
+                    callPermission();
+                }
+                else {
+                    Intent intent = new Intent(HomeDrawerActivity.this, ScanActivity.class);
+                    startActivityForResult(intent, 2);
+                }
+            }
+        });
+
         backgraph.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,8 +146,8 @@ public class HomeDrawerActivity extends BaseActivity {
 
                 if (pickedorders_layout.getChildCount() > 0) ;
                     pickedorders_layout.removeAllViews();
-                getPendingorderdata(constants.ORDER_CREATED);
-                getPickedOrderData(constants.ORDER_PICKED);
+//                getPendingorderdata(constants.ORDER_CREATED);
+//                getPickedOrderData(constants.ORDER_PICKED);
             }
         });
 
@@ -261,6 +284,9 @@ public class HomeDrawerActivity extends BaseActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            callPermission();
+        }
     }
 
     @Override
@@ -280,6 +306,18 @@ public class HomeDrawerActivity extends BaseActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    private void callPermission() {
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+            //If the user has denied the permission previously your code will come to this block
+            //Here you can explain why you need this permission
+            //Explain here why you need this permission
+        }
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_COARSE_LOCATION}, 3);
+
+    }
 
     private void getPendingorderdata(String key) {
 
@@ -321,6 +359,26 @@ public class HomeDrawerActivity extends BaseActivity {
         });
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        // check if the request code is same as what is passed  here it is 2
+        if(requestCode==2 && data!=null)
+        {
+            if(data.getStringExtra("MESSAGE")!=null) {
+                String barcode = data.getStringExtra("MESSAGE");
+                Intent intent = new Intent(HomeDrawerActivity.this, OrderDetailNew.class);
+                intent.putExtra(constants.MOVEORDERNO, barcode);
+                intent.putExtra(constants.User_name, upref.getFirstName());
+                intent.putExtra(constants.userid, upref.getUserId());
+                intent.putExtra(constants.usercode, upref.getKeyUserCode());
+                startActivity(intent);
+            }
+        }
+    }
+
 
     private void getPickedOrderData(String key) {
         APIInterface apiService = new APIClient(this).getClient().create(APIInterface.class);
@@ -688,8 +746,8 @@ public class HomeDrawerActivity extends BaseActivity {
             pendingorder_layout.removeAllViews();
         if (pickedorders_layout.getChildCount() > 0) ;
             pickedorders_layout.removeAllViews();
-        getPendingorderdata(constants.ORDER_CREATED);
-        getPickedOrderData(constants.ORDER_PICKED);
+//        getPendingorderdata(constants.ORDER_CREATED);
+//        getPickedOrderData(constants.ORDER_PICKED);
     }
 
     void addPickedOrders(final int i) {

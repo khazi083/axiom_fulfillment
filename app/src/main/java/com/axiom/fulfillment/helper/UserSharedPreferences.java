@@ -21,6 +21,17 @@ public class UserSharedPreferences {
     private static final String KEY_EMP_CODE = "hrempcode";
     private static final String KEY_USER_ROLE = "userrole";
     private static final String KEY_FCM= "fcmkey";
+    private static final String KEY_COUNTRY_CODE= "countrycode";
+
+
+    public String getKeyCountryCode() {
+        return pref.getString(KEY_COUNTRY_CODE, "");
+    }
+
+    public void setKeyCountryCode(String countryCode) {
+        editor.putString(KEY_COUNTRY_CODE, countryCode);
+        editor.commit();
+    }
 
     public String getKeyUserRole() {
         return pref.getString(KEY_USER_ROLE, "");
